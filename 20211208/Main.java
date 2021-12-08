@@ -432,7 +432,7 @@ ArrayList<String> pitches = new ArrayList<String>();
 
 
 
-
+// 다시 정리해보면, 아래는 Generics를 사용하지 않고 작성해보면 이렇다.
 // import java.util.ArrayList;
 // public class Main {
 //   public static void main(String[] args) {
@@ -443,7 +443,8 @@ ArrayList<String> pitches = new ArrayList<String>();
 //     aList.add("hello");   // 문자열 "hello"가 들어가는게 아닌 List안에 객체로 들어간다.
 //     aList.add("java");
 
-//     String hello = (String)aList.get(0);  // hello 변수(String만 담을 수 있는)에, List안의 객체가 문자열이 아니기 떄문에
+//     String hello = (String)aList.get(0);  // hello 변수(String만 담을 수 있는)에 담으려는
+//                                              List안의 객체가 문자열이 아니기 떄문에
 //     String java = (String)aList.get(1);   // 앞에 (String) 곧, Casting(강제 형변환)을 해줘야 한다.그래야 에러가 안생긴다.
 
 //     System.out.println(hello);  // hello
@@ -452,16 +453,14 @@ ArrayList<String> pitches = new ArrayList<String>();
 //    }
 // }
 
-// 위 내용을 Generics를 사용하면 아래와 같다. (Generics - 입력되는 객체의 자료형을 강제한다.)
-
-
+// 위 내용에서 Generics를 사용하면 아래와 같다. (Generics - 입력되는 객체의 자료형을 강제한다.)
 // import java.util.ArrayList;
 // public class Main {
 //   public static void main(String[] args) {
 
-//     ArrayList<String> aList = new ArrayList<String>();  // Generics(입력되는 객체의 자료형을 강제한다.)를 사용했다.
-
-//     aList.add("hello");  // 문자열로 들어가는게 List안에 객체로 들어간다.
+//     ArrayList<String> aList = new ArrayList<String>();  // Generics(입력되는 객체의 자료형을 강제한다. 여기에서는 문자열)
+//                                                                   를 사용했다.
+//     aList.add("hello");  // "hello"가 문자열로 들어가는게 아니라 List안에 객체로 들어간다.
 //     aList.add("java");
 
 
