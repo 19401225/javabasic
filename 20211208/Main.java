@@ -379,3 +379,100 @@ SHA-256 이라는 알고리즘으로,
 
 
 
+/*
+ Generics - 입력되는 객체의 자료형을 강제한다.
+           
+
+ArrayList pitches = new ArrayList();  이렇게 기본에서, Generics를 사용하면  아래와 같다.
+
+ArrayList<String> pitches = new ArrayList<String>();
+       pitches 라는 ArrayList에 담을 수 있는 자료형은 String 뿐이다.
+       이 List에는 반드시 문자열만 들어와라 곧 자료형을 강제한다.
+
+    pitches.add("123");
+    pitches.add("234");
+    pitches.add(789);   이렇게 실수로 하였을 경우도 그렇지, 에러를 미리 방지할 수도 있고, 
+
+
+*/
+// import java.util.ArrayList;
+// public class Main {
+//   public static void main(String[] args) {   // public은 접근 제한자, 나중에 중요하다
+
+//     // ArrayList aList = new ArrayList();   // ArrayList로 객체를 생성하고,
+//     ArrayList<String> aList = new ArrayList<String>();  //    위 내용을 Generic을 사용하면 이와 같다. 
+
+
+
+
+//     aList.add("hello");  // 글자로 들어가는게 아닌 객체로 들어간다.
+//     aList.add("java");
+    
+//     // String hello = aList.get(0);  // 이 객체를 문자열에 넣으라? 그러면 
+//                                         에러가 생겨서 강제 형변환을 아래와 같이 수정한다. 
+//                                         Stirng만 들어가는 hello라는 변수기 때문이다
+//     String hello = (String)aList.get(0);  // Casting 강제 형변환.... (String)aList.get(0);
+//     String java = (String)aList.get(1);
+
+   
+//     // 제네릭스를 사용하여 자료형을 선언하면 그 이후로는 자료형에 대한 형변환 casting이 필요없다.
+//     // 이미 자바가 aList에는 반드시 String 자료형만 추가된다는 것을 알고 있다.
+//     // 제네릭스를 사용하면 형변환에 대한 불필요한 코딩과 잘못된 형변환 등의 예외를 방지할 수 있다.
+//     // String hello = aList.get(0);
+//     // String java = aList.get(1);
+
+//     System.out.println(hello);
+//     System.out.println(java);
+
+        
+//   }
+// }
+
+
+
+
+
+
+// import java.util.ArrayList;
+// public class Main {
+//   public static void main(String[] args) {
+    
+//     ArrayList aList = new ArrayList();    // ArrayList로 객체를 생성한다.
+
+
+//     aList.add("hello");   // 문자열 "hello"가 들어가는게 아닌 List안에 객체로 들어간다.
+//     aList.add("java");
+
+//     String hello = (String)aList.get(0);  // hello 변수(String만 담을 수 있는)에, List안의 객체가 문자열이 아니기 떄문에
+//     String java = (String)aList.get(1);   // 앞에 (String) 곧, Casting(강제 형변환)을 해줘야 한다.그래야 에러가 안생긴다.
+
+//     System.out.println(hello);  // hello
+//     System.out.println(java);   // java
+
+//    }
+// }
+
+// 위 내용을 Generics를 사용하면 아래와 같다. (Generics - 입력되는 객체의 자료형을 강제한다.)
+
+
+// import java.util.ArrayList;
+// public class Main {
+//   public static void main(String[] args) {
+
+//     ArrayList<String> aList = new ArrayList<String>();  // Generics(입력되는 객체의 자료형을 강제한다.)를 사용했다.
+
+//     aList.add("hello");  // 문자열로 들어가는게 List안에 객체로 들어간다.
+//     aList.add("java");
+
+
+//     String hello = aList.get(0);   // 리스트 안에 0번째 객체를 hello라는 변수(String만 넣을 수 있는)에 넣는다.
+//     String java = aList.get(1);    // java라는 변수 안에(String만 넣을 수 있는) aList의 1번째 객체를 넣는다. 
+//                                    // 위에 aList 객체를 생성할 때 Generics를 사용하였기 때문에 Casting(강제 형변환)이 필요 없다.
+//     System.out.println(hello);   // hello
+//     System.out.println(java);    // java   잘 출력이 된다.
+//   }
+// }
+
+
+
+
