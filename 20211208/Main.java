@@ -343,13 +343,37 @@ SHA-256 이라는 알고리즘으로,
   ArrayList 
  
 */
-import java.util.ArrayList;  // 만들어 놓은 기능을 가져와 사용한다. java.util에 있는 ArrayList기능을 가져온다.
-class Main {
-  public static void main(String[] args) {
+// import java.util.ArrayList;  // 만들어 놓은 기능을 가져와 사용한다. java.util에 있는 ArrayList기능을 가져온다.
+// public class Main {
+//   public static void main(String[] args) {
     
-    ArrayList pitches = new ArrayList();
-  }
-}
+//     ArrayList pitches = new ArrayList(); // 객체 생성
+
+//     pitches.add("123");
+//     pitches.add("234");
+//     pitches.add("789");
+//     pitches.add("5555");
+//     pitches.add(0,"133");  // 이렇게 인덱스 위치를 같이 줘서 원하는 위치에 놓을 수도 있다.
+//     pitches.add(1,"311");
+//     System.out.println(pitches);             // [133, 311, 123, 234, 789, 5555]
+//     System.out.println(pitches.get(1));   // 311      
+//     // get() 메서드를 이용하여 특정 인덱스 값을 추출
+
+//     System.out.println(pitches.size());   // 6  
+//     // size()메서드를 이용하여 리스트의 갯수를 확인
+
+//     System.out.println(pitches.contains("234"));   // true
+//     // .contains() 메서드를 이용하여 포함 여부 확인 : true or false 
+
+//     System.out.println(pitches.remove("789"));
+//     // remove() 메서드를 이용하여 해당 객체를 삭제하고 결과를 리턴 : true or false 
+//     System.out.println(pitches); // [133, 311, 123, 234, 5555]
+
+//     System.out.println(pitches.remove(0)); // 133
+//     // remove() 메서드를 이용하여 해당 인덱스의 객체를 삭제
+//     System.out.println(pitches); // [311, 123, 234, 5555]
+//   }
+// }
 
 
 
