@@ -5,41 +5,42 @@
 
 
 // # 2-7
-import java.util.Scanner;
-class Main {
-  public static void main(String[] args) {
-    int i = 0;
-    int j = 0;
-    int k = 0;
+// import java.util.Scanner;
+// class Main {
+//   public static void main(String[] args) {
+//     int i = 0;
+//     int j = 0;
+//     int k = 0;
 
-    Scanner scan = new Scanner(System.in);
-    i = scan.nextInt();
+//     Scanner scan = new Scanner(System.in);
+//     i = scan.nextInt();
 
-    System.out.println("정숫값 : " + i);
+//     System.out.println("정숫값 : " + i);
 
-    j += i / 10;
-    k += i % 10;
+//     j += i / 10;
+//     k += i % 10;
 
-    System.out.println("마지막 자릿수를 제외한 값은 " + j +"입니다.");
-    System.out.println("마지막 자릿수는 " + k + "입니다.");
-  
+//     System.out.println("마지막 자릿수를 제외한 값은 " + j +"입니다.");
+//     System.out.println("마지막 자릿수는 " + k + "입니다.");
+// }
+//}
 
 
 // # 2-6
 
-    int a = 0;
-    Scanner sc = new Scanner(System.in);
+//     int a = 0;
+//     Scanner sc = new Scanner(System.in);
     
-    e = sc.nextInt();
-    System.out.println("정숫값 : " + e);
+//     e = sc.nextInt();
+//     System.out.println("정숫값 : " + e);
 
-    int b = j + 10;
-    int c = j - 10;
+//     int b = j + 10;
+//     int c = j - 10;
 
-    System.out.println("10을 더한 값은 " + a + "입니다. ");
-    System.out.println("10을 뺀 값은 " + b + "입니다. ");
-  }
-}
+//     System.out.println("10을 더한 값은 " + a + "입니다. ");
+//     System.out.println("10을 뺀 값은 " + b + "입니다. ");
+//   }
+// }
 
 
 
