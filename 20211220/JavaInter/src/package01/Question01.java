@@ -3,6 +3,37 @@ package JavaInter.src.package01;
 import java.util.Scanner;
 public class Question01 {
     public static void main(String[] args) {
+        Scanner sc = new Scanner(System.in);
+
+        int count = 0;
+        int fno = 0;
+        int lno = 0;
+        char ox = 'o';
+
+        while (ox != 'x') {
+            System.out.println("숫자를 입력하세요");
+            int a = sc.nextInt();
+            System.out.println("숫자를 입력하세요");
+            int b = sc.nextInt();
+
+            if (a > b) {
+                System.out.println("앞 숫자가 큽니다.");
+                count ++;
+                fno ++;
+            } else {
+                System.out.println("뒷 숫자가 큽니다.");
+                count ++;
+                lno ++;
+            } System.out.println("계속 할까요?(계속 : o, 중단 : x)");
+              String t = sc.next();
+              ox = t.charAt(0);
+        } System.out.println("프로그램을 종료합니다.");
+          System.out.print("시도 횟수 : " + count + "\t");
+          System.out.print("앞숫자가 큰 경우 : " + fno + "\t");
+          System.out.print("뒷숫자가 큰 경우 : " + lno);
+    }
+}
+
 
     //     int count = 0;        // 전체 질문 횟수를 담을 변수
     //     int fno = 0;          // 앞 숫자 큰 경우의 변수
@@ -33,9 +64,9 @@ public class Question01 {
     //         }
     //         System.out.println("프로그램을 종료합니다.");
 
-    //         System.out.print("시도횟수 : " + count + "/t");
-    //         System.out.print("앞숫자가 큰 경우 : " + fno + "/t/t");
-    //         System.out.print("뒷숫자가 큰 경우 : " + lno + "/t");
+    //         System.out.print("시도횟수 : " + count + "\t");
+    //         System.out.print("앞숫자가 큰 경우 : " + fno + "\t");
+    //         System.out.print("뒷숫자가 큰 경우 : " + lno);
         
     //     }
     // }

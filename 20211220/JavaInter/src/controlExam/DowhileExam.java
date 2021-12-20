@@ -150,13 +150,12 @@ do ~ while은 while의 변형으로 반드시 한 번은 무조건 실행되도�
             int tmp = i;
             do {
                 if ((tmp%10) % 3 == 0 && tmp % 10 != 0) {
-                    System.out.print(i + " 짝");
+                    System.out.println(i + " 짝");
                 }
 
             } while ((tmp /= 10) != 0);  //
-        }
-        
-    }
+       
+
 }
 
 
