@@ -1,0 +1,33 @@
+THE P VERSUS NP PROBLEM
+STEPHEN COOK
+
+1. Statement of the Problem
+The P versus NP problem is to determine whether every language accepted
+by some nondeterministic algorithm in polynomial time is also accepted by some
+(deterministic) algorithm in polynomial time. To define the problem precisely it
+is necessary to give a formal model of a computer. The standard computer model
+in computability theory is the Turing machine, introduced by Alan Turing in 1936
+[37]. Although the model was introduced before physical computers were built, it
+nevertheless continues to be accepted as the proper computer model for the purpose
+of defining the notion of computable function.
+Informally the class P is the class of decision problems solvable by some algorithm
+within a number of steps bounded by some fixed polynomial in the length of the
+input. Turing was not concerned with the efficiency of his machines, rather his
+concern was whether they can simulate arbitrary algorithms given sufficient time. It
+turns out, however, Turing machines can generally simulate more efficient computer
+models (for example, machines equipped with many tapes or an unbounded random
+access memory) by at most squaring or cubing the computation time. Thus P is a
+robust class and has equivalent definitions over a large class of computer models.
+Here we follow standard practice and define the class P in terms of Turing machines.
+Formally the elements of the class P are languages. Let Σ be a finite alphabet
+(that is, a finite nonempty set) with at least two elements, and let Σ∗ be the set
+of finite strings over Σ. Then a language over Σ is a subset L of Σ∗
+. Each Turing
+machine M has an associated input alphabet Σ. For each string w in Σ∗
+there is
+a computation associated with M with input w. (The notions of Turing machine
+and computation are defined formally in the appendix.) We say that M accepts w
+if this computation terminates in the accepting state. Note that M fails to accept
+w either if this computation ends in the rejecting state, or if the computation fails
+to terminate. The language accepted by M, denoted L(M), has associated alphabet
+Σ and is defined by
