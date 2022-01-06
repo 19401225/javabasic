@@ -1,12 +1,4 @@
 
-
-
-
-
-
-
-
-
 오라클 홈페이지에서 연습해보자.
 https://livesql.oracle.com/apex/f?p=590:1:12399080574071::NO:::
 
@@ -18,6 +10,10 @@ CREATE TABLE address (
         zip_code VARCHAR2(6),
         address_detail VARCHAR2(20));
  // 테이블 생성
+
+기본키 설정)
+ALTER TABLE address ADD CONSTRAINT pk_zip_code PRIMARY KEY (zip_code);
+
 
 
 
@@ -46,7 +42,7 @@ FOREIGN KEY
 
 
 
-ALTER TABLE address ADD CONSTRAINT pk_zip_code PRIMARY KEY (zip_code);
+
 
 
 
@@ -61,11 +57,12 @@ CREATE TABLE customer (
             birth           VARCHAR2(8),
             job             VARCHAR2(20),
             zip_code        VARCHAR2(6));
-
+기본키 설정)
 ALTER TABLE customer ADD CONSTRAINT pk_customer PRIMARY KEY (customer_id);
 
+다른 테이블과 연결)
 ALTER TABLE customer ADD CONSTRAINT fk_customer_zip_code FOREIGN KEY (zip_code) REFERENCES address(zip_code);
-                               // FOREIGN KEY는 외래키를 의미한다.
+                              
 
 
 3) 
@@ -101,7 +98,7 @@ ALTER TABLE reservation ADD CONSTRAINT pk_reservation PRIMARY KEY (reserv_no);
 
 관계 연결)
 ALTER TABLE reservation ADD CONSTRAINT fk_reservation_customer_id FOREIGN KEY (customer_id) REFERENCES customer (customer_id);
-                                                                // 외래키와 연결해준다는 의미
+                                                              
 
 
 5)
@@ -472,45 +469,21 @@ DENSE_RANK() OVER(PARTITION BY SUBSTR(A.reserv_date,1,6)
 순위를 매긴다.  ,파티션으로 묶어서      ,월별로 잘라낸 것을    
 
 
+
+
+
 성별을 구분해보자.
 
 SELECT COUNT(customer_id) 고객수,
        SUM(DECODE(sex_code,'M',1,0)) 남자,
-       SUM(DECODE(sex_code,'F',1,0)) 여자
-                                 기타
+       SUM(DECODE(sex_code,'F',1,0)) 여자,
+       SUM(DECODE(sex_code,'',1,0))  기타
 FROM customer;
 
 
 
 
 
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-# 문자 자르기에 대해 다시 살펴보면,
-substr()   문자열들 중에 일부분만 선택한다. ('열이름',시작위치,원하는길이)
-        substr('ABC',1,2)      >> AB
-
-# DECODE에 대해 다시 살펴보면,
-DECODE(열이름, 조건값, 치환값, 기본값)   // 조건 논리 처리
-IF-THEN-ELSE-END처럼 조건 논리를 가능하게 하는 함수, SQL구문에서 항상 쓰임
- 치환값 : 조건에 해당 (true)
- 기본값 : 조건에 해당하지 않을 경우 (false)
- 산술 계산 외에 문자열 표현도 가능하고 다양한 형태로 응용하여 활용할 수 있다.
- DECODE(열이름, 조건, true, false조건, ture,false...)
 
 
 
