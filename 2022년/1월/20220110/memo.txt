@@ -1,0 +1,827 @@
+
+MySQL---------------------------------
+
+
+
+sqldb 라는 이름의 데이터베이스를 만드시오.
+
+dept이름의 테이블 생성
+
+deptno 정수
+dname 문자열 14
+loc 문자열 13 
+
+emp 이름의 테이블 생성
+empno 숫자
+ename 문자열 10
+job 문자열 9
+mgr 숫자
+hiredate 날짜
+sal 숫자
+comm 숫자
+
+salgrade 테이블 생성
+grade 숫자
+losal 숫자
+hisal 숫자
+
+
+
+쿼리에서 코드로 만들어보자 (작은 따옴표는 ESC키 밑에를 사용하자.)
+
+CREATE DATABASE IF NOT EXISTS `sqldb2`;
+USE `sqldb`;   
+
+CREATE TABLE `dept` (
+`deptno` INT,
+`dname` VARCHAR(14),
+`loc` VARCHAR(13) 
+)
+
+ 
+ // 행은 'ESC'아래 `로 표시하고, 
+ // 데이터값은 작은 따옴표(')를 사용한다.
+
+INSERT INTO `dept` (`deptno`, `dname`, `loc`) VALUES
+   (10, 'ACCOUNTING','NEW YORK'),
+   (20, 'research','dallas'),
+   (30, 'sales', 'chicago'),
+   (40, 'operations', 'boston');
+
+
+  // IF NOT EXISTS는, 데이터 값이 있으면 업데이트, 없으면 새로 만들어라는 의미이다.
+  // 테이블 및 행을 생성할 때는 'ESC'버튼 아래 `를 사용하자.
+CREATE TABLE IF NOT EXISTS `emp` (
+  `EMPNO` int NOT NULL,
+  `ENAME` varchar(10) DEFAULT NULL,
+  `JOB` varchar(9) DEFAULT NULL,
+  `MGR` int DEFAULT NULL,
+  `HIREDATE` date DEFAULT NULL,
+  `SAL` int DEFAULT NULL,
+  `COMM` int DEFAULT NULL,
+  `DEPTNO` int DEFAULT NULL
+)
+
+
+INSERT INTO `emp` (`EMPNO`, `ENAME`, `JOB`, `MGR`, `HIREDATE`, `SAL`, `COMM`, `DEPTNO`) VALUES
+	(7839, 'KING', 'PRESIDENT', NULL, '1981-11-17', 5000, NULL, 10),
+	(7698, 'BLAKE', 'MANAGER', 7839, '1981-05-01', 2850, NULL, 30),
+	(7782, 'CLARK', 'MANAGER', 7839, '1981-05-09', 2450, NULL, 10),
+	(7566, 'JONES', 'MANAGER', 7839, '1981-04-01', 2975, NULL, 20),
+	(7654, 'MARTIN', 'SALESMAN', 7698, '1981-09-10', 1250, 1400, 30),
+	(7499, 'ALLEN', 'SALESMAN', 7698, '1981-02-11', 1600, 300, 30),
+	(7844, 'TURNER', 'SALESMAN', 7698, '1981-08-21', 1500, 0, 30),
+	(7900, 'JAMES', 'CLERK', 7698, '1981-12-11', 950, NULL, 30),
+	(7521, 'WARD', 'SALESMAN', 7698, '1981-02-23', 1250, 500, 30),
+	(7902, 'FORD', 'ANALYST', 7566, '1981-12-11', 3000, NULL, 20),
+	(7369, 'SMITH', 'CLERK', 7902, '1980-12-11', 800, NULL, 20),
+	(7788, 'SCOTT', 'ANALYST', 7566, '1982-12-22', 3000, NULL, 20),
+	(7876, 'ADAMS', 'CLERK', 7788, '1983-01-15', 1100, NULL, 20),
+	(7934, 'MILLER', 'CLERK', 7782, '1982-01-11', 1300, NULL, 10);
+
+
+
+    CREATE TABLE IF NOT EXISTS `salgrade` (
+  `grade` int DEFAULT NULL,
+  `losal` int DEFAULT NULL,
+  `hisal` int DEFAULT NULL
+)
+
+
+
+INSERT INTO `salgrade` (`grade`, `losal`, `hisal`) VALUES
+	(1, 700, 1200),
+	(2, 1201, 1400),
+	(3, 1401, 2000),
+	(4, 2001, 3000),
+	(5, 3001, 9999);
+
+
+#1. 테이블에서 열 선택하기
+사원테이블에 emp에서 사원번호 이름 월급만 출력하시오.
+
+SELECT empno, ename, sal
+FROM emp;
+
+
+#2. 사원테이블의 모든 열을 출력하세요.
+
+SELECT *
+FROM emp;
+
+
+#2-1. dept테이블의 모든 열을 출력하고 deptno를 한 번더 끝에 출력
+
+SELECT *, deptno
+FROM dept;
+
+
+#3. 컬럼명 별명 사용하기
+    연봉 내림차순으로 정렬할 것
+emp 테이블에서 
+ 사원번호 사원이름 급여 연봉
+
+
+
+SELECT ename, sal * 12 연봉
+FROM emp
+ORDER BY 연봉 DESC;
+
+
+
+#4. 연결 연산자
+이름ename과  급여sal을 한 셀에 붙여서 표시하시오.
+ Orcle 에서는 || 이 가능하지만, MySQL에서는 사용할 수 없다.
+ 공통적으로 사용가능한 concat(ename, ' ', sal) 이름과연봉 
+
+  오라클과 MySQL에서도 같이 사용이 가능한 문법은 concat이다
+  SELECT CONCAT(ename,' ',sal) 이름과연봉
+  FROM emp;
+
+
+
+열이름은 월급
+ㅇㅇ님의 월급은 ㅇㅇ입니다.
+
+SELECT ename 이름,
+	    sal 급여,
+	    CONCAT(ename,'님의',' ','월급은',' ',sal,'입니다')
+FROM emp;
+
+
+
+
+#. 중복 제거
+emp 테이블에서 job의 중복을 제거하여 출력하시오.
+
+SELECT DISTINCT job 
+FROM emp;
+
+
+
+#6. 정렬
+emp테이블에서 
+이름 부서번호 월급을 
+부서번호 오름차순으로
+월급은 내림차순으로 출력하시오.
+
+SELECT ename 이름,
+	   deptno 부서번호,
+	   sal 월급
+FROM emp
+ORDER BY deptno ASC, sal DESC;
+
+
+     ** 이렇게 숫자로 표현하는 방법도 있다.
+
+SELECT ename 이름,
+	   deptno 부서번호,
+	   sal 월급
+FROM emp
+ORDER BY 2 ASC, 3 DESC;
+
+
+
+#7. WHERE 
+emp테이블에서 
+이름 부서번호 월급을 
+월급 3000인 사람만 출력
+
+SELECT ename 이름,
+	   deptno 부서번호,
+	   sal 월급
+FROM emp
+WHERE sal = 3000;
+
+
+
+
+#8. 입사일이 
+입사일이 82년 12월 22일인 사람을 출력하시오.
+hiredate는 날짜형이니까 문자형으로 감싸줘야 한다.
+
+SELECT ename 이름,
+	   deptno 부서번호,
+	   sal 월급,
+	   hiredate 입사일
+FROM emp
+WHERE hiredate = '1982-12-22';
+
+
+#9. 입사일이 82년 12월 22일 이후인 사람을 출력하시오
+    날짜는 항상 이전/이후만 사용(그날이 포함된 표현만 사용)
+
+SELECT ename 이름,
+	   deptno 부서번호,
+	   sal 월급,
+	   hiredate 입사일
+FROM emp
+WHERE hiredate >= '1982-12-22';
+
+
+
+# 산술 연산자
+연봉 36000 이상인 사원들의 이름과 연봉을 출력하시오.
+WHERE절에서는 AS 명이 아닌 본명을 적어줘야 한다.
+
+SELECT ename 이름,
+	   sal 월급,
+       sal * 12 AS 연봉
+FROM emp
+WHERE sal * 12 >= 36000;
+
+
+
+
+
+
+
+#11. BETWEEN AND 
+
+월급이 1000에서 3000사이인  사원들의 이름과 월급을 출력
+
+SELECT ename 이름,
+       sal 월급
+FROM emp
+WHERE SAL BETWEEN 1000 AND 3000;
+
+ // BETWEEN 없이 AND만으로도 사용할 수 있다.
+
+SELECT ename 이름,
+       sal 월급
+FROM emp
+WHERE SAL >= 1000 AND SAL <= 3000; 
+
+
+
+
+#12. LIKE (~와 같은)
+이름에서 첫 글자가 'S'로 시작하는 사원들의 이름과 월급을 출력하시오.
+%와일드카드, 이 자리에 어떠한 글자, 몇 개가 와도 상관하지 않는다.
+
+SELECT ename 이름,
+       sal 월급
+FROM emp
+WHERE ename LIKE 'S%';
+
+
+
+#12-2. 이름에서 두 번째 글자가 'M'로 시작하는 사원들의 이름과 월급을 출력하시오.
+
+SELECT ename 이름,
+       sal 월급
+FROM emp
+WHERE ename LIKE '_M%';
+
+
+이메일 확인은 '%@%';
+
+SELECT ename 이름,
+       sal 월급
+FROM emp
+WHERE ename LIKE '%@%';
+
+
+
+#13. null 
+데이터가 할당되지 않은 상태, 알 수 없는 값(0도 아니고 ' '도 아닌 값)
+= 연산자는 사용할 수 없고 is null 또는 is not null 을 사용한다.
+
+SELECT ename 이름,
+	   comm 수수료
+FROM emp
+WHERE comm IS NULL;
+(WHERE comm IS NOT NULL;)
+
+
+
+
+
+NVL(열이름, 치환값) 
+Oracle 에서는 NVL(comm,0)
+MySQl 에서는 IFNULL
+
+SELECT ename 이름,
+       sal 월급,
+	   IFNULL(comm,0) * sal 
+FROM emp;
+
+
+
+#14. IN (NOT IN)
+
+직업이 salesman, analyst, manager 인 사람들만 
+이름 월급 직업을 출력하시오.
+
+SELECT ename 이름,
+	   sal 월급,
+	   job 직업
+FROM emp
+WHERE job IN ('salesman', 'analyst', 'manager');
+
+
+
+SELECT ename 이름,
+	   sal 월급,
+	   job 직업
+FROM emp
+WHERE job = 'salesman'
+OR job = 'analyst'
+OR job = 'manager';
+
+
+
+#15. 논리 연산자
+직업이 salesman이고 
+
+
+SELECT ename 이름,
+	   sal 월급,
+	   job 직업
+FROM emp
+WHERE job = 'salesman' 
+AND sal >= 1200;
+
+
+
+#16. 함수
+단일행함수 - 하나의 행을 입력받아 하나의 행을 반환
+다중행함수 - 여러 개의 행을 입력받아 하나의 행을 반환하는 함수
+
+이름을 전부 대문자,소문자,첫글자대문자로 출력
+이렇게 DB마다 사용방법이 조금씩 다르다.
+Oracle 은 SUBSTR
+MySQL 은 SUBSTRING   이렇게 이름을 다르게 사용한다.
+
+SELECT upper(ename) 대문자,
+       lower(ename) 소문자,
+       CONCAT(UPPER(LEFT(ename,1)), LOWER(SUBSTRING(ename,2))) 첫머리대문자
+FROM emp;
+
+
+Oracle에서는 initcap()을 사용한다.
+initcap('abcd') >> Abcd
+
+
+
+# 문자열의 길이 개수
+
+SELECT ename 이름,
+       length(ename) 길이
+FROM emp;
+
+
+# replace
+ 특정 철자를 다른 철자로 변경 
+
+SELECT ename 이름,
+    REPLACE(sal, 0, '*')
+FROM emp;
+
+
+SELECT REPLACE(ename, SUBSTRING(ename,2), '*') 보안이름,
+	   job 직업,
+	   sal 연봉
+FROM emp;
+
+
+
+
+
+# 특정 철자를 N개로 채우기
+ 이름과 월급을 출력하는데,
+ 월급 자릿수를 10개로 하고 월급을 출력
+ 나머지는 '*'로 채울 것
+SELECT ename 이름,
+       lpad(sal,10,'*') 월급
+FROM emp;
+
+
+
+이름과 월급을 출력하시오.
+(월급 100만원마다 '■'로 표현해보세요.)
+
+SELECT ename 이름,
+       rpad(sal,(sal/100),'■') 월급
+FROM emp;
+
+
+SELECT ename 이름,
+	   sal 월급,
+	   lpad('■',ROUND(sal/100),'■') 그림으로표현
+FROM emp;
+ // 우선 '■'를 하나 출력하고, 1000일 경우 값은 10이 되고 나머지 9의 크기를 '■'로 채운다는 의미
+
+
+
+# ROUND
+ 반올림 - 기본은 소숫점 아래 한 자리에서 소수점 위로 반올림한다.
+ 
+SELECT ename 이름,
+	   sal 실제월급,
+	   ROUND(sal, -1)  // 소숫점 위의 1의 자리에서 반올림 (2975 >> 2980), 5를 반올림
+FROM emp;
+ // ROUND(sal, -2) 라고 할 경우 10의 자리를 반올림 (2975 >> 3000), 25를 반올림
+
+
+# TRUNC 절삭(숫자값 또는 열이름, 남길소숫점뒷자리의수)
+ Oracle 에서는 trunc()
+ MySQl 에서는 truncate()
+
+SELECT ename 이름,
+	   sal 실제월급,
+	   truncate(sal/30, 2) 일급
+FROM emp;
+
+
+
+# mod (숫자값 또는 열이름, 나눌수) 
+ Oracle, MySQL 동일하게 쓰임
+
+사원번호empno가 홀수이면 1, 짝수이면 0을 출력하세요
+
+SELECT empno 사원번호,
+       mod(empno,2) 홀수는일짝수는영
+FROM emp;
+
+
+# 코로나 때문에 사원의 반절만 출근하라는 
+  사원번호가 홀수인 사람인 명단을 출력하세요.
+
+SELECT empno 사원번호,
+	   ename 이름
+FROM emp
+WHERE MOD(empno,2) = 1;
+
+
+
+# 이런, 확진자 증가로 인해
+  2의 배수인 사람과 6의 배수인 사람의 명단 제출하라.
+  OR를 사용해야 2의 배수도 6의 배수도 출력된다 (AND로 하면 공통된 조건에만 출력)
+
+SELECT empno 사원번호,
+	   ename 이름
+FROM emp
+WHERE MOD(empno,2) = 0
+OR MOD(empno,6) = 0;
+
+
+
+# 날짜와 시간을 나타내는 함수
+SELECT now()        현재 날짜와 시간 // 2022-01-10 13:14:43  자료형은 DateTime이다.
+SELECT CURDATE()    현재 날짜
+ 위의 now() 값에서 날짜만 표기하려면,
+ SELECT DATE_FORMAT(now(),'%Y-%m-%d'); 
+
+일(day)차이를 가져올 때 사용하는 함수는 'DATEDIFF(날짜1, 날짜2)
+이 외 second 초, minute 분, hour 시, day 일, week 주, month 월, quarter 분기, year 연을
+지정해서 가져올 때는 'TIMESTAMPDIFF(단위, 날짜1, 날짜2)'
+
+# 이름, 입사일, 오늘까지 총 몇 달을 근무했는지 출력하시오.
+  (months_between 함수는 두 날짜 간의 월 수를 반환한다.)
+
+SELECT ename 이름,
+       hiredate 입사일,
+       CURDATE() 현재날짜,
+       TIMESTAMPDIFF(year, hiredate, CURDATE()) 근무년수,
+       TIMESTAMPDIFF(MONTH, hiredate, CURDATE()) 근무월수,
+       TIMESTAMPDIFF(WEEK, hiredate, CURDATE()) 근무주수,
+       TIMESTAMPDIFF(DAY, hiredate, CURDATE()) 근무일수
+FROM emp;
+
+
+
+
+## INSERT 삽입,  ALTER 수정
+
+CREATE TABLE testtb (
+    toy_id INT,
+    toy_name VARCHAR(4),
+    age INT);
+
+INSERT INTO testtb VALUES (1, '우디', 25);
+INSERT INTO testtb (toy_id, toy_name) VALUES (2,'버즈');
+ // 입력값을 생략하면 (age열) null값이 들어가게 된다.
+
+ SELECT *
+ FROM testtb;
+
+
+## 자동 증가 AUTO_INCREMENT
+ 1부터 증가하는 값을 자동으로 입력해준다.
+ INSERT에서는 열을 생략하고 입력한다.
+ 주의할 점은 AUTO_INCREMENT로 지정하는 열은 반드시 PRIMARY KEY로 지정해야만 한다.
+
+CREATE TABLE testtb2 (
+    toy_id INT AUTO_INCREMENT PRIMARY KEY,
+    toy_name VARCHAR(4),
+    age INT );
+
+
+INSERT INTO testtb2 VALUES (null,'영희',20);
+INSERT INTO testtb2 VALUES (null,'철수',22);
+SELECT LAST_INSERT_ID();         // 마지막으로 INSERT한 ID를 확인할 때
+
+ // 시작점을 1이 아닌, 다른 숫자로 변경할 수 있다.
+ALTER TABLE testtb2 AUTO_INCREMENT = 100;   
+INSERT INTO testtb2 VALUES (null,'태지',24);
+
+ // AUTO_INCREMENT가 3씩 증가하도록 설정할 수 있다.
+SET @@AUTO_INCREMENT_increment = 3;
+INSERT INTO testtb2 VALUES (null, '토마스', 22);
+INSERT INTO testtb2 VALUES (null, '마리아', 22);
+
+
+
+
+
+## 테이블의 값을 다른 테이블로 붙여넣기
+
+SELECT COUNT(*)
+FROM testtb2;
+
+ // 데이터베이스 sqldb >> testtb2 테이블의 정보를 나타낸다.
+DESC sqldb.testtb2;
+
+ 
+SELECT *
+FROM testtb2 LIMIT 3;  // testtb2 테이블에서 3개만 출력
+
+
+CREATE TABLE testtb3 (NAME VARCHAR(5), age INT);
+
+INSERT INTO testtb3    
+SELECT toy_name, age 
+FROM testtb2;   
+ // testtb3 에 삽입한다. toy_name과 age열을, testtb2 로 부터
+
+
+## UPDATE 테이블 수정
+
+UPDATE testtb2
+SET toy_name = '서울'
+WHERE toy_name = '영희';
+SELECT *
+FROM testtb2 
+ // SET 열이름 = '바꿀값'
+ // WHERE조건 바꿀열이름 = '기존값';
+ 
+ 
+UPDATE testtb3 
+SET NAME = '백구';
+SELECT NAME
+FROM testtb3 LIMIT 3;   
+ // testtb3 테이블의 NAME열의 값들이 모두 '백구'로 바뀌었다.
+
+
+
+
+## DELETE 
+ 회원탈퇴
+
+
+------------ Oracle SQL Developer ------------
+
+지금까지 MySQL에서 실습해봤다.
+이제 Oracle SQL Developer로 가보자. 
+테이블을 생성하고 데이터 값을 삽입한 후 commit; 을 같이 실행하자.
+웹 https://livesql.oracle.com/ 에서 진행할 경우 바탕화면에 있는 'sql200.sql' 파일을 업로드하자.
+아래는 Oracle SQL Developer에서 직접 실행해보자.
+'sql200.sql' 파일을 실행하면 생성할 테이블과 삽입할 값들이 자세히 나와 있다.
+ 참고하면서 직접 입력 후 실행 및 커밋할 것.
+
+## 열의 내용
+ empno     사원번호
+ ename     이름
+ job       직업
+ mgr       매니저
+ hiredate  입사일
+ sal       급여
+ comm      수수료
+ deptno    부서번호
+
+
+
+
+## 날짜 관련 함수
+  
+SELECT TO_DATE(sysdate)    => 22/01/10
+FROM dual;
+ // TO_DATE(sysdate 또는 '2022-01-10')  => 22/01/10 이렇게 날짜 형식으로 출력된다.
+
+sysdate 현재 날짜
+last_day()  입력한 날짜의 달에서 마지막 날짜를 가져오는 함수이다.
+    SELECT last_day('20220110')   => 22/01/31
+    FROM dual; 
+
+    SELECT TO_CHAR(last_day('20220110'),'YYYYMMDD')  => 20220131
+    FROM dual;
+
+ADD_MONTHS()  입력한 날짜의 달에 ±월을 한 날짜를 가져오는 함수이다.
+    SELECT ADD_MONTHS('20220110', -2)  => 21/11/10
+    FROM dual;
+
+    SELECT TO_CHAR(ADD_MONTHS('20220110', -2), 'YYYYMMDD')   => 20211101
+    FROM dual;
+
+
+
+SELECT ename 이름,
+       ROUND(MONTHS_BETWEEN(sysdate, hiredate))||'개월' 근무한개월수
+FROM emp;
+ // months_between(현재날짜, 비교할날짜) => 몇 개월인지 출력된다.
+ // 함수를 사용하지 않는 방법도 있다.
+
+
+SELECT TO_DATE('2022-01-10','RRRR-MM-DD') - TO_DATE('2018-10-01', 'RRRR-MM-DD') 근무일
+FROM dual;
+
+
+
+## 얼마 후의 날짜
+
+SELECT ADD_MONTHS(TO_DATE('2022-01-10','RRRR-MM-DD'), 10) 십개월후날짜   => 22/11/10
+FROM dual;
+
+
+## 특정 날짜 뒤에 오는 요일의 날짜
+NEXT_DAY('기준일자','찾을요일')
+
+SELECT SYSDATE 현재날짜,
+       NEXT_DAY(SYSDATE, 1) 다음일요일,
+       NEXT_DAY(SYSDATE, 2) 다음월요일,
+       NEXT_DAY(SYSDATE, 3) 다음화요일,
+       NEXT_DAY(SYSDATE, 4) 다음수요일,
+       NEXT_DAY(SYSDATE, 5) 다음목요일,
+       NEXT_DAY(SYSDATE, 6) 다음금요일,
+       NEXT_DAY(SYSDATE, 7) 다음토요일
+FROM dual;
+
+
+# 다음 수요일은 몇 일?
+SELECT SYSDATE 오늘날짜,
+       NEXT_DAY(SYSDATE,4) 다음수요일
+FROM dual;
+
+
+# 이번 달이 며칠 남았을까?  last_day()
+SELECT SYSDATE 오늘날짜,
+       LAST_DAY(SYSDATE) 이번달마지막날,
+       ROUND(LAST_DAY(SYSDATE) - TO_DATE(SYSDATE))||'일' 남은날수
+FROM dual;
+
+
+# 이름이 'SCOTT'인 사원의 이름, 입사일(+요일)을 출력하시오.
+SELECT ename 이름,
+       hiredate 입사일,
+       TO_CHAR(hiredate, 'day') 입사한요일
+FROM emp
+WHERE ename = 'SCOTT';
+
+
+## TO_CHAR 
+ 숫자형 또는 날짜형 => 문자형 
+ 특히 날짜형은 문자로 변환하여 년/월/일/요일 등으로 출력한다.
+
+SELECT hiredate 입사날짜,
+       TO_CHAR(hiredate,'RRRR') 입사년도,
+       TO_CHAR(hiredate,'MM') 입사월,
+       TO_CHAR(hiredate,'DD') 입사일,
+       TO_CHAR(hiredate,'day') 입사한요일
+FROM emp
+WHERE ename = 'SCOTT';
+
+
+
+# 1981년도에 입사한 사원들의 이름,입사일을 출력하시오.
+
+SELECT ename 이름,
+       hiredate 입사일
+FROM emp
+WHERE TO_CHAR(hiredate,'RRRR') = 1981
+ORDER BY TO_CHAR(hiredate,'RRRR/MM/DD') ASC;
+
+
+
+4자리인 경우엔 차이가 없고 2자리인 경우에 차이가 있다고 합니다.
+yy 는 무조건 '20'이 앞에 붙는데,
+rr < 50 일 경우 '20'이 붙고, rr >= 50 '19'가 붙는다.
+TO_DATE('00','yy') ==> 2000
+TO_DATE('00','rr') ==> 2000   //'00'은 서로 차이가 없지만,
+
+TO_DATE('50','yy') ==> 2050  (yy는 무조건 '20'이 앞에 붙음)
+TO_DATE('50','rr') ==> 1950  (rr은 50보다 작을 경우(rr<50), '20'이 붙고,
+                                   50보다 크거나 같을 경우(rr>=50), '19'가 붙음)
+
+
+# EXTRACT 함수
+ 년도,월,일과 같은 특정 내용을 출력하는 함수이다.
+ year 년도, month 월, day 일, hour 시간, minute 분, second 초, 
+ timezone_hour : timezone형의 시간
+ timezone_minute : timezone형의 분
+ timezone_region : timezone의 지역
+ timezone_abbr : timezone 지역에 대한 약어
+ 주의할 점 : year,month,day는 상관없지만 시간에 대한 정보는 반드시 timestamp형이 와야한다.
+
+SELECT ename 이름,
+       EXTRACT(year from hiredate) 입사년도,
+       EXTRACT(month from hiredate) 입사월,
+       EXTRACT(day from hiredate) 입사일
+FROM emp;
+
+
+SELECT EXTRACT(year from sysdate) 현재년도,
+       EXTRACT(month from sysdate) 현재월,
+       EXTRACT(day from sysdate) 현재일
+FROM dual;
+
+
+# TO_CHAR 를 이렇게 사용할 수도 있다.
+
+SELECT ename 이름,
+       sal 급여,
+       TO_CHAR(sal,'999,999')||'만원' 쉼표넣은급여
+FROM emp;
+
+
+SELECT ename 이름,
+       sal 급여,
+       TO_CHAR(sal,'L999,999')||'만원' 쉼표넣은단위급여
+FROM emp;
+ // 한글에서는 '원'으로 표시됨
+
+
+
+# TO_DATE 함수
+# 1981년 11월 17일에 입사한 사원의 이름,입사일을 출력하시오. (hiredate형식 81/11/17)
+
+SELECT ename 이름,
+       hiredate 입사일
+FROM emp
+WHERE hiredate = '81/11/17';
+  // 다른 나라에서는 일/월/년 순으로 사용하는 경우가 있어서 못찾을 수가 있기 때문에
+  // 아래와 같은 정확한 방법을 사용하자.
+
+SELECT ename 이름,
+       hiredate 입사일
+FROM emp
+WHERE hiredate = TO_DATE('81/11/17', 'RR/MM/DD');
+
+
+
+## 형변환
+
+SELCET ename 이름,
+       sal 급여
+FROM emp
+WHERE sal = '3000'; 
+ // 문자임에도 불구하고 잘 찾아준다.
+ // Oracle이 암묵적으로 형변환을 하기 때문이다. (문자형을 숫자형으로 자동 형변환)
+
+
+CREATE TABLE EMP32 (
+    ename VARCHAR2(10),
+    sal   VARCHAR2(10));
+
+INSERT INTO EMP32 VALUES('SCOTT', '3000');
+INSERT INTO EMP32 VALUES('SMITH', '2200');
+commit;
+ // 문자로 삽입해도 자동 형변환된다.
+
+
+SELECT ename 이름,
+       sal 급여
+FROM EMP32
+WHERE sal = '3000';
+
+  // 위 아래 결과는 동일하다. (자동 형변환)
+
+SELECT ename 이름,
+       sal 급여
+FROM EMP32
+WHERE TO_NUMBER(sal) = 3000;
+
+
+# NVL (열이름 또는 값, 치환값)
+SELECT ename 이름,
+       sal 급여,
+       comm 수수료,
+       NVL(comm,0) 널값은영인수수료,
+       sal + comm 널값을더하면널이됨,
+       sal + NVL(comm,0) 급여더하기수수료영
+FROM emp;
+
+
+
+# NVL 2 (열이름 또는 값, 지정값1, 지정값2)
+ null이 아닌 경우 지정값1을 출력하고, null인 경우 지정값2를 출력
+
+SELECT ename 이름,
+       sal 급여,
+       comm 수수료,
+       NVL2(comm, sal+comm, sal)
+FROM emp;
+
+
+내일(2022년 1월 11일)은 
+IF문을 SQL내에서 구현하는 DECODE에 대해 자세히 알아보자.
