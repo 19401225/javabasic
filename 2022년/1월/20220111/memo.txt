@@ -1,0 +1,823 @@
+
+# DECODE
+ IF문을 SQL내에서 구현하는 DECODE
+
+---- livesql.oracle.com 에서 진행하였다. 기존에 올렸던 sql200.sql파일을 다시 Run Script 후 진행 -----
+
+select ename 이름,
+       deptno 부서번호,
+       DECODE(deptno, 10, 300, 20, 400, 0) 보너스
+from emp;
+  // deptno가 10이면 300, 20이면 400, else는 0
+
+
+
+# 사원번호, 홀짝여부를 출력하시오.
+select ename 이름,
+       empno 사원번호,
+       DECODE(mod(empno,2), 0, '짝수', '홀수') 비고
+FROM emp;
+   // 0이면 짝수, 아니면 홀수, 
+   
+
+select ename 이름,
+       empno 사원번호,
+       DECODE(mod(empno,2), 0, '짝수', 1, '홀수') 비고
+FROM emp;
+     // 0이면 '짝수', 1이면 '홀수'
+
+
+# job이 salesmans이면 보너스 5000, 그 외 2000
+select ename 이름,
+       job 직책,
+       DECODE(job,'SALESMAN',5000,2000) 보너스
+FROM emp;
+
+
+
+
+
+# CASE (CASE문 안에서는 쉼표가 들어가지 않는다.)
+ 보너스 지급
+ 월급이 3000불이상이면 500, 2000불이상이면 300, 1000불 이상이면 200, 나머지 모두 0
+
+ CASE WHEN 조건1 THEN 결과1
+      WHEN 조건2 THEN 결과2
+      ELSE 결과3
+ END as 이름
+
+
+select ename 이름,
+       job 직책,
+       sal 급여,
+       CASE WHEN sal >= 3000 then 500
+            WHEN sal >= 2000 then 300
+            WHEN sal >= 1000 then 200
+            ELSE 0 
+        END AS 보너스
+FROM emp;
+
+
+
+# 커미션이 null이면 500, 아니면 0을 출력 (IS NULL, IN NOT NULL)
+select ename 이름,
+       comm 수수료,
+       CASE WHEN comm IS NULL then 500
+            ELSE 0
+       END AS 보너스
+FROM emp;
+
+
+
+# 이름,직책,보너스(salesmans, analyst = 500, clerk, manager = 400)
+   같은 결과를 내는 값을 담을 때는, 
+   값 또는 열이름 in (여러 값) then 결과   
+
+select ename 이름,
+       job 직책,
+       CASE WHEN job in ('SALESMAN','ANALYST') then 500
+            WHEN job in ('CLERK','MANAGER') then 400
+            ELSE 0
+       END AS 보너스
+FROM emp;
+
+
+
+
+ 직급 전체에서 제일 높은 급여
+select MAX(sal)
+from emp;
+
+
+# MAX / MIN / AVG / SUM / count
+
+ 직책이 'SALESMAN'중에서 제일 높은 급여
+select MAX(sal)
+from emp
+where job = 'SALESMAN';
+
+
+ 직책을 묶어서, 가장 높은 급여인 사람들만 출력
+SELECT job 직책,
+       MAX(sal)
+FROM emp
+GROUP BY job;
+
+
+ 각 직책 별 최소급여를 내림차순(높은순) 출력하시오
+SELECT job 직책,
+       MIN(sal) 최소급여
+FROM emp
+GROUP BY job
+ORDER BY 최소급여 DESC;
+
+
+ 직책별 최소월급 출력 (salesman은 제외) 최소월급 높은 것부터 출력
+ 아니다를 != 또는 <> 로 표현한다.
+
+SELECT job 직책,
+       MIN(sal) 최소급여
+FROM emp
+WHERE job != 'SALESMAN'
+GROUP BY job
+ORDER BY 최소급여 DESC;
+
+
+ 커미션의 평균을 출력하시오.()
+SELECT ROUND(avg(NVL(comm,0))) 수수료평균
+FROM emp;
+
+
+ 직책별 급여 합계 (높은순으로)
+select job 직책,
+       SUM(sal) 급여합계
+FROM emp
+GROUP BY job
+ORDER BY 급여합계 DESC;
+
+
+ 위에 이어서, 6000 이상 받는, GROUP BY에 조건을 줄 때는 WHERE가 아닌 HAVING을 사용한다.
+select job 직책,
+       SUM(sal) 급여합계
+FROM emp
+GROUP BY job
+HAVING SUM(sal) >= 6000;
+
+
+
+ 갯수를 확인할 때는 보통 select COUNT(*)을 사용한다. 특정 열이 필요 없고 열마다 값이 같기 때문이다.
+ (단, null값이 있는 열 또는 comm은 제외)
+
+select count(empno)   => 14
+from emp;
+
+
+ 평균을 낼 때 null값은 무시한다.
+select avg(comm) 
+from emp;
+ 
+ 0까지 갯수로 세기 때문에 정확한 평균이 나오지 않는다. (위의 방법으로 하자.)
+
+select avg(NVL(comm,0)) 
+from emp; 
+
+
+
+# RANK
+ analyst, manager 중에서, 급여를 출력 
+
+select ename 이름,
+       job 직책,
+       sal 급여,
+       RANK() OVER(ORDER BY sal DESC) 급여순위
+FROM emp
+WHERE job in ('ANALYST','MANAGER');
+
+
+
+ 직급별(partition by job order...)로 급여순위 출력하시오.
+select ename 이름,
+       job 직책,
+       sal 급여,
+       RANK() OVER(partition by job order by sal desc) 급여순위
+FROM emp;
+
+
+ 직책이 analyst, manager인 사원들의 이름,직업,월급,급여순위를 출력
+  (순위가 1이 사원이 두 명있을 경우 다음 순위가 3위가 아닌 2위로 출력되도록, DENSE_RANK)
+select ename 이름,
+       job 직책,
+       sal 급여,
+       RANK() OVER(order by sal desc) 중복되는급여순위,
+       DENSE_RANK() OVER(order by sal desc) 중복ㄴㄴ급여순위
+FROM emp
+WHERE job in ('ANALYST', 'MANAGER');
+
+
+
+
+
+# 1981년도에 입사한 사원들의 이름,직업,급여,급여순위(직책별로/over(partition by job order..))를 출력하시오.
+
+select ename 이름,
+       job 직업,
+       hiredate 입사일,
+       sal 월급,
+       DENSE_RANK() OVER(order by sal desc) 급여순위
+FROM emp
+WHERE TO_CHAR(hiredate, 'RRRR') = 1981; 또는 WHERE EXTRACT(year from hiredate) = 1981;
+
+  
+ // 결과는 같지만 아래와 같은 방법을 사용해야 하는 경우가 있다.
+select ename 이름,
+       job 직업,
+       sal 월급,
+       DENSE_RANK() OVER (partition by job ORDER BY sal desc) 급여순위
+FROM emp
+WHERE hiredate BETWEEN to_date('1981/01/01','RRRR/MM/DD') 
+AND                    to_date('1981/12/31','RRRR/MM/DD');
+
+
+
+
+# NTILE        등급
+ 데이터들을 즉정 기준으로 분할하여 결과값 반환
+ NTILE(나눌등급의숫자) OVER ( PARTITION BY 조건1 ORDER BY 조건2)
+ NTILE(나눌등급의숫자) OVER (ORDER BY 열이름 ASC or DESC)
+
+ 월급을 4개 등급으로 (0~25%,  25~50%,  50~75%,  75~100%)
+select ename 이름,
+       job 직업,
+       sal 월급,
+       NTILE(4) OVER (ORDER BY sal DESC) 등급
+FROM emp;
+
+
+
+# CUME_DIST     비율
+
+select ename 이름,
+       sal 월급,
+       DENSE_RANK() OVER(ORDER BY sal DESC) 급여순위,
+       CUME_DIST() OVER (ORDER BY sal DESC)*100 순위비율
+FROM emp;
+
+  // 아래는 추가 정리
+
+select ename 이름,
+       sal 월급,
+       DENSE_RANK() OVER(ORDER BY sal DESC) 급여순위,
+       ROUND(CUME_DIST() OVER (ORDER BY sal DESC)*100,2)||'%' 순위비율
+FROM emp;
+
+
+
+
+# LISTAGG (열이름1, ', ') WITHIN GROUP (ORDER BY 열이름1) 
+ 구분자를 설정하고(, 또는 / ) 항목을 구분하여 값을 가로로 출력하는 함수이다.
+ GROUP 은 ~내의 라는 의미로 사용하고, GROUP BY절은 필수로 함께 사용해야 한다.
+
+
+select deptno 부서번호,
+       LISTAGG(ename,' / ') WITHIN GROUP (ORDER BY ename) 인원명단
+FROM emp
+GROUP BY deptno;
+
+
+SELECT job 직책,
+       LISTAGG(ename,' || ') WITHIN GROUP (ORDER BY ename) 인원명단
+FROM emp
+GROUP BY job;
+
+
+
+# LAG(열이름,1) OVER (ORDER BY 열이름 ASC) "이전행"
+  LEAD(열이름,2) OVER (ORDER BY 열이름 ASC) "다다음행"
+ 데이터의 바로 이전행과 다음행 출력
+
+SELECT empno 사원번호,
+       ename 이름,
+       sal 월급,
+       LAG(sal,1) OVER (ORDER BY sal ASC) "이전행",
+       LEAD(sal,1) OVER (ORDER BY sal ASC) "다음행"
+FROM emp;
+
+
+
+SELECT empno 사원번호,
+       ename 이름,
+       hiredate 입사일,
+       LAG(hiredate,1) OVER (ORDER BY hiredate ASC) "이전사원입사일",
+       LEAD(hiredate,1) OVER (ORDER BY hiredate ASC) "다음사원입사일"
+FROM emp
+WHERE job in ('ANALYST','MANAGER');
+
+
+
+
+# 열을 행으로 출력 (SUM + DECODE)
+ 우선, 부서번호, 부서번호별 월급의 합계를 출력해보자.
+
+SELECT deptno 부서번호,
+       SUM(sal) 급여합계,
+       ROUND(AVG(sal)) 급여평균
+FROM emp
+GROUP BY deptno
+ORDER BY ROUND(AVG(sal)) DESC;
+
+
+
+ 강제로 가로로 표현하기
+SELECT SUM(DECODE(deptno, 10, sal)) "10",
+       SUM(DECODE(deptno, 20, sal)) "20",
+       SUM(DECODE(deptno, 30, sal)) "30"
+FROM emp;
+
+            
+ 
+SELECT *
+FROM (SELECT deptno, sal
+      FROM emp);
+
+ // 가로로 표현하기 PIVOT(SUM(열이름) FOR 컬럼할열이름 in (열값1,열값2))
+SELECT *
+FROM (SELECT deptno, sal
+      FROM emp)
+PIVOT (SUM(sal) FOR deptno in(10,20,30));
+
+
+
+
+# SUM OVER 누적
+ 첫행부터 현재 행까지 열의 합계
+ sum(누적할 컬럼명) over(partition by 그룹화할 컬럼명 order by 정렬할 컬럼명 정렬 방식)
+ SUM(누적열이름) OVER 
+   ()
+
+SELECT ename 이름,
+       sal 급여,
+       SUM(sal) OVER (ORDER BY sal ROWS BETWEEN UNBOUNDED PRECEDING AND CURRENT ROW) 누적값
+FROM emp;
+ // UNBOUNDED PRECEDING는 첫 번째 것을 의미한다.
+ // CURRENT ROW는 현재 ROW를 의미한다.
+
+
+select job 직책,
+       sum(sal) 급여
+FROM emp
+GROUP BY CUBE(job);
+
+
+
+select deptno 부서번호,
+       job 직책,
+       sum(sal) 급여
+FROM emp
+GROUP BY CUBE(deptno, job);
+
+
+
+
+select deptno 부서번호
+       job 직책,
+       sum(sal) 급여
+FROM emp
+GROUP BY GROUPING SETS((deptno),(job),());
+                   //  부서번호, 직책, 전체
+
+
+
+     SETS((deptno),(job)) 부서번호, 직책
+     SETS((deptno,job), ()) 부서번호, 직책
+
+
+
+
+
+# 넘버링 
+ 출력되는 각 행에 고유한 숫자값을 부여하는 함수이다.
+ OVER에 반드시 ORDER BY를 기술해야만 한다. 
+ ROW_NUMBER() OVER (ORDER BY 정렬할열이름) 
+
+SELECT ROW_NUMBER() OVER (ORDER BY empno) 번호, 
+       empno 사원번호, ename 이름
+from emp;
+
+
+ 부서별로(OVER(partition by deptno)) 월급에 대한 순위를 나타내시오
+SELECT ROW_NUMBER() OVER (PARTITION BY deptno ORDER BY sal DESC) 순위,
+       deptno 부서번호,
+       sal 월급
+FROM emp;
+
+
+
+
+--- 여기까지 기본(초급)을 배웠다. 오후부터 중급으로 가보자. (안돼..) --- 
+
+select *
+from emp, dept; 
+
+# 2개의 테이블 조인 
+
+from dept (deptno / dname / loc)
+from emp (empno	/ ename / job / mgr	/ hiredate / sal / comm / deptno)
+ // deptno 가 중복된다.
+
+select ename, loc
+from emp, dept
+WHERE emp.deptno = dept.deptno;
+ // 서로 다른 테이블에 있는 컬럼들을 하나의 결과로 출력하려면 Join을 사용해야 한다.
+ // 조인을 위해서는 조건이 있어야 하는데, 두 개 이상의 테이블이 중복되어야 한다.
+
+
+select ename, loc
+from emp, dept
+WHERE emp.deptno = dept.deptno;
+
+
+
+select ename 이름,
+       loc 지역,
+       job 직업
+from emp, dept
+WHERE emp.deptno = dept.deptno
+AND emp.job = 'ANALYST';
+
+
+
+select ename 이름,
+       loc 지역,
+       job 직업,
+       emp.deptno 부서번호
+from emp, dept
+WHERE emp.deptno = dept.deptno
+AND emp.job = 'ANALYST';
+ // deptno 부서번호가 두 테이블에 모두 있어서, 앞에 emp. 또는 dept.를 넣어서 명확하게 기술한다.
+ // 아래처럼 표현하면 된다. 한 번 별명을 설정하면 본명이 아닌, 별명으로만 기술해줘야 한다.
+
+
+select A.ename 이름,
+       B.loc 지역,
+       A.job 직업,
+       A.deptno 부서번호
+from emp A, dept B
+WHERE A.deptno = B.deptno
+AND A.job = 'ANALYST';
+
+
+
+# 여러 테이블 조인 
+from dept (deptno / dname / loc)
+from emp (empno	/ ename / job / mgr	/ hiredate / sal / comm / deptno)
+from salgrade (grade / losal / hisal)  급여등급/낮은급여/높은급여
+
+select e.ename 이름,
+       e.sal 급여,
+       s.grade 등급
+from emp e, salgrade s
+WHERE e.sal BETWEEN s.losal AND s.hisal
+ORDER BY e.sal DESC;
+
+
+# 셀프 테이블 조인
+  (여기 조금 이해가 안가네..)
+select e.ename 사원,
+       e.job 사원직책,
+       m.ename 관리자,
+       m.job 관리자직책
+from emp e, emp m
+WHERE e.mgr = m.empno;
+
+
+
+ // 다른 방법도 알아보자.
+
+# 동일한 열을 묶어주는 표준방식 ON 
+
+select e.ename 이름,
+       e.job 직책,
+       e.sal 월급,
+       e.deptno 부서번호,
+       d.loc 부서위치
+from emp e JOIN dept d
+ON (e.deptno = d.deptno)
+ORDER BY e.deptno ASC;
+
+
+
+
+# 동일한 열을 묶어주는 표준방식 USING 
+ USING에서는 조인 조건 대신에 연결 시 사용할 컬럼이름만 기술하면 된다.
+ 양쪽 테이블에 모두 존재한다는 의미로 [테이블명.컬럼명]형식으로 사용하지 않는다.
+ ON (e.deptno = d.deptno) 
+ WHERE e.deptno = d.deptno   이렇게 두 가지 방법으로 사용하지 않고
+  USING(deptno)   이렇게 공통된 열이름만 적어준다.
+
+select e.ename 이름,
+       e.job 직책,
+       e.sal 월급,
+       d.loc 부서위치
+from emp e JOIN dept d
+USING(deptno);
+
+
+
+# from절에서 테이블을 이어주는, NATURAL JOIN
+  NATURAL JOIN은 서로 묶어주거나, USING(동일한열) 을 사용하지 않고
+  두 테이블 모두 존재하는 동일한 컬럼(열)을 암시적으로 조인을 수행한다.
+  동일한 deptno 컬럼을 직접 입력하지 않아도, Oracle이 스스로 찾아서 조인을 수행한다.
+
+select e.ename 이름,
+       e.job 직책,
+       e.sal 월급,
+       d.loc 부서위치
+from emp e NATURAL JOIN dept d;
+
+
+
+# 다른 JOIN 방식,    left/right join
+ from emp e RIGHT OUTER JOIN dept d  // 기본적으로 오른쪽의 dept 테이블은 모두 출력이 된다.
+ ON (e.deptno = m.deptno)
+
+ from emp e LEFT OUTER JOIN dept d  // 기본적으로 왼쪽의 emp 테이블은 모두 출력된다.
+ ON (e.deptno = m.deptno)
+
+select e.ename 이름,
+       e.job 직책,
+       e.sal 월급,
+       e.deptno 부서번호,
+       d.loc 부서위치
+from emp e RIGHT OUTER JOIN dept d
+ON (e.deptno = d.deptno);
+ // 마지막 행의 loc : BOSTON은 dept테이블에만 있는 값이다.
+
+
+select e.ename 이름,
+       e.job 직책,
+       e.sal 월급,
+       e.deptno 부서번호,
+       d.loc 부서위치
+from emp e LEFT OUTER JOIN dept d
+ON (e.deptno = d.deptno);
+ // dept테이블에서는 deptno 40까지 존재하지만, emp테이블은 30까지만 존재해서 30까지만 출력되고
+ // 40은 출력되지 않는다.
+
+
+
+
+# UNION ALL
+
+select deptno 부서번호,
+       SUM(sal) 급여합계
+FROM emp
+GROUP BY deptno
+ORDER BY deptno;
+  // 출력된 값에 무언가를 더 붙여서 보고 싶다고 한다면??
+  // UNION ALL 을 작성한 후 밑으로 동일하게 작성하는데, 위와 동일한 형태인 열의 값을 가져야 한다.
+  // 위, 아래로 연결하여 하나의 결과로 출력하는 방법이다.
+  // TO_NUMBER(null), 위쪽의 쿼리 유형이 숫자이기 때문에 동일하게 맞춰주었다.
+  // 하지만 null로 사용할 때는 자료형 상관없이 사용할 수 있다.
+  1. 컬럼의 갯수가 일치해야 한다.
+  2. 타입이 동일해야 한다.
+  3. ORDER BY 절은 제일 아래쪽 쿼리에만 작성할 수 있다. (가장 마지막 줄)
+  4. 결과로 출력되는 컬럼의 이름은 위쪽 쿼리의 이름으로 출력된다.
+
+select deptno 부서번호,
+       SUM(sal) 급여합계
+FROM emp
+GROUP BY deptno
+UNION ALL
+SELECT TO_NUMBER(null) 부서번호,
+       SUM(sal)
+FROM emp;
+
+
+
+
+select deptno 부서번호,
+       SUM(sal) 급여합계
+FROM emp
+GROUP BY deptno
+UNION ALL
+SELECT null,
+       null 
+FROM emp;
+
+
+
+# 교집합 출력 INTERSECT : 양쪽 SELECT 문에 중복되는 행만 출력
+  select,from,where문을 두 번 작성하고 가운데 INTERSECT(교집합)을 넣어준다.
+  위쪽 쿼리인 부서번호 10,20 사원들에 대한 데이터와 아래 쿼리 부서 번호 20,30번에 대한 데이터 간의
+  교집합인 부서번호 20의 데이터 값이 출력된다.
+
+select ename 이름,
+       sal 급여,
+       job 직책,
+       deptno 부서번호
+FROM emp
+WHERE deptno in (10,20)
+INTERSECT
+SELECT ename,
+       sal,
+       job,
+       deptno
+FROM emp
+WHERE deptno in(20,30);
+
+
+
+# 단일행 서브쿼리(subquery)  =, <>, - 
+ MARTIN보다 더 많은 월급을 받는 사원들의 이름과 월급을 출력하시오.
+ 
+select ename 이름,
+       sal 월급
+from emp
+WHERE sal > (SELECT sal
+             FROM emp
+             WHERE ename = 'MARTIN');
+
+
+ SCOTT과 같은 월급을 받는 사원들의 이름, 월급을 출력하시오. (Scott은 제외하고, <>)
+select ename 이름,
+       sal 월급
+from emp 
+WHERE sal = (SELECT sal
+             FROM emp
+             WHERE ename = 'SCOTT')
+AND ename <> 'SCOTT';
+             
+
+
+
+다중행 서브쿼리 
+ 서브쿼리에서 메인쿼리로 여러 개의 값이 반환(in, not in, any, all)
+ empno not in mgr 는 mgr에 없는 empno라는 의미 (empno - mgr)
+ >all    가장 큰 값보다 크다는 의미
+ >any    가장 작은 값보다 크다는 의미
+ <all    가장 적은 값보다 작다.
+ <any    가장 큰 값보다 작다.
+
+ 직업이 salesman인 사원들과 같은 월급을 받는 사람들의 이름,월급을 출력하시오.
+select ename 이름,
+       sal 월급,
+       job 직책
+from emp 
+WHERE sal in (SELECT sal
+             FROM emp
+             WHERE job  = 'SALESMAN');
+
+
+
+담당 매니저가 있는 사원들의 이름,월급,직책을 출력하시오. (서브쿼리 사용)
+
+SELECT ename 이름,
+       sal 급여,
+       job 직책
+FROM emp
+WHERE empno not in (select mgr
+                    from emp
+                    WHERE mgr is not null);
+ // 자기 직속 후임이 한 명도 없는 사원은, 사원번호가 관리자 번호가 아닌 사원들이다.
+ // empno 사원번호에서 mgr 담당자번호(=사원번호)를 빼면, 관리자가 아닌 사람들의 empno 사원번호가 나온다.
+
+
+
+
+
+-- 마지막 시간 시험 준비 
+
+테이블 작성 시 # PRIMARY KEY(기본키) : 해당 테이블의 대표를 설정할 때 사용한다. (주민등록번호)
+                              기본키, 식별자 역할을 한다. 
+                              기본키 설정 시 중복값을 허용하지 않고 null값을 가질 수 없다.
+
+              # FOREIGN KEY(외래키) : 다른 테이블의 연결 관계를 정의하는 키
+              # UNIQUE KEY(고유키) : 행에서 유일한 데이터 값으로 구성된 열 
+                                     중복값이 없는 유일한 값을 갖지만 PRIMARY KEY가 아닌 데이터값이 존재한다.
+                                     (PRIMARY KEY와 비슷하지만 대표는 아니다.)
+
+
+
+
+
+
+
+# DDL (Data Difinition Language) 
+  데이터베이스의 데이터를 보관하고 관리하기 위해 제공되는 여러 객체(object)의
+  생성/변경/삭제 관련 기능을 수행한다.DML(데이터 조작어)과 달리 명령어를 수행하자마자 
+  데이터베이스에 수행한 내용이 바로 반영되는 특성(자동으로 commit)이 있다.
+  ROLLBACK을 통한 실행 취소가 불가능하기 때문에 사용할 때 주의해야 한다.
+ 
+  CREATE    객체 생성
+  ALTER     객체 변경 (ADD열추가, RENAME열이름변경, MODIFY열자료형변경, DROP열삭제)
+  RENAME    테이블 이름 변경
+  TRUNCATE  테이블의 데이터 삭제
+  DROP      객체 삭제
+
+
+
+
+# DML (Data Manipulation Language) 데이터 조작어,
+  데이터를 조작하여 저장하는 일련의 과정을 트랜잭션(Transaction)이라고 하는데, 
+  DML은 트랜잭션을 다루는 명령어라고 할 수 있다.
+  테이블의 속성과 제약조건에 주의해야 하고 DML을 실행한 후 commit;을 실행해야
+  데이터베이스에 적용되며 'F12'또는 상단에 '롤백'버튼으로 되돌릴 수 있다.
+
+ INSERT 테이블에 새로운 행을 삽입
+ UPDATE 테이블에 이미 있는 내용을 갱신
+ DELETE 테이블 행을 삭제
+
+
+
+
+
+
+# update구문 
+  테이블에 저장된 데이터를 수정하기 위해 사용하는 명령문
+  기존 행을 수정하기 위해 사용된다.
+  UPDATE절에 WHERE조건절을 사용할 수 있고 WHERE절을 사용하지 않을 경우
+  테이블에 있는 모든 내용이 수행된다.
+
+  예) department 테이블에 department_name이 'Sample_Dept'인 행을 찾아서
+      manager_id값을 500으로, location_id를 2000으로 변경하시오.
+UPDATE 테이블명
+SET 열이름1 = 데이터값 1,
+    열이름2 = 데이터값 2
+WHERE 조식건
+
+UPDATE departmnet
+SET manager_id = 500,
+    location_id = 2000
+WHERE department_name = 'Sample_Dept';
+
+
+
+
+
+
+# 아래는 HeideSQL에서만 사용할 수 있는 구문이다.
+show databases; 데이터베이스 목록 전체보기
+show tables;  테이블들 목록전체보기
+
+아래는 oracle에서도 사용할 수 있는 구문이다.
+select * from tables;      tables테이블 안에 있는 거 전체 보여줘
+select name from tables;   tables라는 테이블 안에 있는 name값을 전부 보여줘라
+
+
+
+
+# 트랜잭션을 정상적으로 완료하기 위한 명령어는?  commit; 
+
+
+
+
+# 실습 (테이블 만들기)
+
+professor 테이블
+id(PK), name, tel
+
+CREATE TABLE professor (
+    `id` VARCHAR(50) not null primary key,
+    `name` VARCHAR(50),
+    `tel` INT
+);
+테이터를 넣고,
+lee,leesuyoung, 221
+yoon,yoonjonshin, 222
+
+INSERT INTO professor VALUES ('lee', 'leesuyoung', 221);
+INSERT INTO professor VALUES ('yoon', 'yoonjongshin', 222);
+commit;
+
+subject 테이블 
+sid, stid(fk), subid(fk)
+
+ALTER TABLE subject ADD CONSTRAINT fk_subid FOREIGN KEY(subid) REFERENCES stid(subid);
+
+
+데이터를 넣고,
+c100,yoon,s100
+c200,lee,s200
+
+
+다른 테이블과 연결)
+ALTER TABLE order_info ADD CONSTRAINT fk_order_info_item_id FOREIGN KEY (item_id) REFERENCES item (item_id);
+ALTER TABLE order_info ADD CONSTRAINT fk_order_info_reserv_no FOREIGN KEY (reserv_no) REFERENCES reservation (reserv_no);
+
+
+
+library
+도서관 앱을 구축하려고 한다.
+요구사항을 분석하여 테이블을 생성하고 데이터를 넣어 무결성을 검증하시오.
+
+1. 필요한 테이블의 필드와 속성을 정의하시오.
+   책이름 VARCHAR(50),
+   분야 VARCHAR(50),
+   수량 INT,
+
+
+2. 예시, 도서정보/책관리/고객관리/직원관리 테이블
+   id, 책이름, 분야, 수량, 대여기간, 반납일
+   id가 pk, 책이름,수량은 null을 허용하지 않음
+
+
+3. 구현 
+
+
+(책관리, 빌려간 고객관리, 직원관리, 용품관리)
+
+
+
+
+학원관리 DB를 구축하시오. academy
+
+1. 필요한 테이블의 필드와 속성을 정의하시오.
+        학생관리s_mgt, 선생님관리t_mgt, 일정표 schdl
+2. id, name, 수강과목course, 등록일reg
+   t_id, name, 과목course
+   과목별,담당선생님teacher,시간표schdl
+3. 구현  
+
+학생관리, 선생님관리, 시간표,
+
+

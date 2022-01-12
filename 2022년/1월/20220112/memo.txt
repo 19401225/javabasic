@@ -1,0 +1,760 @@
+
+시험은 내일(22년 1월 13일 목) 오후에 MySQL을 사용해서 볼 것이다.
+
+HeidiSQL을 대신해서 사용할 수 있는 MySQL을 다운로드 받자.
+(더 성능이 좋고, 세련됨)
+
+https://dev.mysql.com/downloads/installer/
+mysql-installer-community-8.0.27.1.msi 를 다운로드 받자. (web이 아님)
+
+
+
+MySQL 다운로드중... 우선 HeidiSQL에서 실습하자 (구문은 같음)
+
+SELECT ~ FROM (~WHERE)
+테이블에서 데이터를 추출하는 기능 
+실제 데이터베이스의 내용은 변경되지 않는다.
+
+
+
+SHOW databases
+
+# shop 이라는 데이터베이스(스키마) 생성
+# shop안에 `member` 테이블 생성
+  member_id    char(8)   PK NN
+  member_name  char(5)      NN
+  member_addr  char(20)
+
+
+
+CREATE TABLE `shop`.`member` (
+  `member_id` CHAR(8) NOT NULL,
+  `member_name` CHAR(5) NOT NULL,
+  `member_addr` CHAR(20) NULL,
+  PRIMARY KEY (`member_id`))
+ENGINE = InnoDB
+DEFAULT CHARACTER SET = utf8;
+
+
+
+# shop 데이터베이스(스키마) 안에 `product`테이블 생성
+  product    char(4) PK NN
+  cost       int        NN
+  make_date  date  
+  company    char(5)
+  amount     int        NN
+
+ 위 내용을 코드로 살펴보면 아래와 같다.
+
+CREATE TABLE `shop`.`product` (
+  `product_name` CHAR(4) NOT NULL,
+  `cost` INT NOT NULL,
+  `make_date` DATE NULL,
+  `company` CHAR(5) NULL,
+  `amount` INT NOT NULL,
+  PRIMARY KEY (`product_name`))
+ENGINE = InnoDB
+DEFAULT CHARACTER SET = utf8;
+
+
+테이블 우클릭하여 'Select Rows - Limit 1000' 클릭하면,
+1000개의 자료를 보여준다. '번개버튼' 또는 Ctrl + Enter눌러서 실행할 것.
+
+
+SELECT * FROM shop.member;
+
+
+직접 입력해도 SQL구문으로 입력이 된다.
+INSERT INTO `shop`.`member` (`member_id`, `member_name`, `member_addr`) VALUES ('tess', '나훈아', '경기 부천');
+INSERT INTO `shop`.`member` (`member_id`, `member_name`, `member_addr`) VALUES ('hero', '임영웅', '서울 은평');
+INSERT INTO `shop`.`member` (`member_id`, `member_name`, `member_addr`) VALUES ('iyou', '아이유', '인천 남구');
+INSERT INTO `shop`.`member` (`member_id`, `member_name`, `member_addr`) VALUES ('jyp', '박진영', '경기 고양');
+
+
+
+직접 수정하고 코드를 살펴보면 이러하다.
+UPDATE `shop`.`member` SET `member_addr` = '서울 강남' WHERE (`member_id` = 'hero');
+
+
+직접 삭제하고 코드를 살펴보면 이러하다.
+DELETE FROM `shop`.`member` WHERE (`member_id` = 'jyp');
+
+
+# workbench 적응할 겸 실습해볼까
+SELECT * FROM shop.product;
+
+
+SELECT member_name 이름, 
+       member_addr 주소 
+FROM shop.member;
+
+
+SELECT *
+FROM shop.member
+WHERE member_name = '아이유';
+
+
+# 더 실습
+DROP DATABASE IF EXISTS market_db;  -- 만약 market_db가 존재하면 우선 삭제한다.
+CREATE DATABASE market_db;
+USE market_db;
+
+
+CREATE TABLE member -- 회원 테이블
+( mem_id  		CHAR(8) NOT NULL PRIMARY KEY, -- 사용자 아이디(PK)
+  mem_name    	VARCHAR(10) NOT NULL, -- 이름
+  mem_number    INT NOT NULL,  -- 인원수
+  addr	  		CHAR(2) NOT NULL, -- 지역(경기,서울,경남 식으로 2글자만입력)
+  phone1		CHAR(3), -- 연락처의 국번(02, 031, 055 등)
+  phone2		CHAR(8), -- 연락처의 나머지 전화번호(하이픈제외)
+  height    	SMALLINT,  -- 평균 키
+  debut_date	DATE  -- 데뷔 일자
+);
+
+
+
+CREATE TABLE buy -- 구매 테이블
+(  num 		INT AUTO_INCREMENT NOT NULL PRIMARY KEY, -- 순번(PK)
+   mem_id  	CHAR(8) NOT NULL, -- 아이디(FK)
+   prod_name 	CHAR(6) NOT NULL, --  제품이름
+   group_name 	CHAR(4)  , -- 분류
+   price     	INT  NOT NULL, -- 가격
+   amount    	SMALLINT  NOT NULL, -- 수량
+   FOREIGN KEY (mem_id) REFERENCES member(mem_id)
+);
+  // ROREIGN KEY는 다른 테이블과 연결하는 키가 된다.
+  // buy테이블의 mem_id와, references member테이블의 mem_id를 연결한다는 의미.
+
+
+# 이제 데이터를 넣자 (복붙)
+
+INSERT INTO member VALUES('TWC', '트와이스', 9, '서울', '02', '11111111', 167, '2015.10.19');
+INSERT INTO member VALUES('BLK', '블랙핑크', 4, '경남', '055', '22222222', 163, '2016.08.08');
+INSERT INTO member VALUES('WMN', '여자친구', 6, '경기', '031', '33333333', 166, '2015.01.15');
+INSERT INTO member VALUES('OMY', '오마이걸', 7, '서울', NULL, NULL, 160, '2015.04.21');
+INSERT INTO member VALUES('GRL', '소녀시대', 8, '서울', '02', '44444444', 168, '2007.08.02');
+INSERT INTO member VALUES('ITZ', '잇지', 5, '경남', NULL, NULL, 167, '2019.02.12');
+INSERT INTO member VALUES('RED', '레드벨벳', 4, '경북', '054', '55555555', 161, '2014.08.01');
+INSERT INTO member VALUES('APN', '에이핑크', 6, '경기', '031', '77777777', 164, '2011.02.10');
+INSERT INTO member VALUES('SPC', '우주소녀', 13, '서울', '02', '88888888', 162, '2016.02.25');
+INSERT INTO member VALUES('MMU', '마마무', 4, '전남', '061', '99999999', 165, '2014.06.19');
+
+INSERT INTO buy VALUES(NULL, 'BLK', '지갑', NULL, 30, 2);
+INSERT INTO buy VALUES(NULL, 'BLK', '맥북프로', '디지털', 1000, 1);
+INSERT INTO buy VALUES(NULL, 'APN', '아이폰', '디지털', 200, 1);
+INSERT INTO buy VALUES(NULL, 'MMU', '아이폰', '디지털', 200, 5);
+INSERT INTO buy VALUES(NULL, 'BLK', '청바지', '패션', 50, 3);
+INSERT INTO buy VALUES(NULL, 'MMU', '에어팟', '디지털', 80, 10);
+INSERT INTO buy VALUES(NULL, 'GRL', '혼공SQL', '서적', 15, 5);
+INSERT INTO buy VALUES(NULL, 'APN', '혼공SQL', '서적', 15, 2);
+INSERT INTO buy VALUES(NULL, 'APN', '청바지', '패션', 50, 1);
+INSERT INTO buy VALUES(NULL, 'MMU', '지갑', NULL, 30, 1);
+INSERT INTO buy VALUES(NULL, 'APN', '혼공SQL', '서적', 15, 1);
+INSERT INTO buy VALUES(NULL, 'MMU', '지갑', NULL, 30, 4);
+
+select * from buy;
+select * from member;
+
+
+
+select * 
+from member
+WHERE mem_name LIKE '__핑크';
+
+
+
+# 에이핑크보다 키가 큰 사람을 출력하시오.(서브쿼리)
+select mem_name, height
+from member
+where height > (SELECT height
+			    FROM member
+				WHERE mem_name = '에이핑크');
+
+
+# 데이터 수정
+  DML (Data Manipulation Language) 데이터 조작어,
+  데이터를 조작하여 저장하는 일련의 과정을 트랜잭션(Transaction)이라고 하는데, 
+  DML은 트랜잭션을 다루는 명령어라고 할 수 있다.
+
+ INSERT 테이블에 새로운 행을 삽입
+ UPDATE 테이블에 이미 있는 내용을 갱신 (여러 개를 동시에 할 수 있음)
+ DELETE 테이블 행을 삭제
+
+
+use market_db;
+
+
+CREATE TABLE emp (
+emp_id		INT,
+emp_name	CHAR(4),
+age			INT);
+
+
+INSERT INTO emp VALUES (1,'우디',25);
+
+테이블 우클릭 'Alter Table' 클릭하여
+PK NN 등 수정할 수가 있다.
+
+
+CREATE TABLE vips(
+vip_id INT auto_increment primary key,
+vip_name char(4),
+age int);
+
+테이블 생성 시 열에 auto_increment를 설정하면
+1부터 자동으로 1씩 증가한다.
+
+INSERT INTO vips VALUES(null,'지렁이',23);
+INSERT INTO vips VALUES(null,'기러기',25);
+
+
+마지막 insert 한 내용이 몇 개인지 확인할 수 있다.
+select last_insert_id();
+
+
+
+
+
+CREATE TABLE buy -- 구매 테이블
+(  num 		INT AUTO_INCREMENT NOT NULL PRIMARY KEY, -- 순번(PK)
+   mem_id  	CHAR(8) NOT NULL, -- 아이디(FK)
+   prod_name 	CHAR(6) NOT NULL, --  제품이름
+   group_name 	CHAR(4)  , -- 분류
+   price     	INT  NOT NULL, -- 가격
+   amount    	SMALLINT  NOT NULL, -- 수량
+   FOREIGN KEY (mem_id) REFERENCES member(mem_id)
+);
+  // ROREIGN KEY는 다른 테이블과 연결하는 키가 된다.
+  // buy테이블의 mem_id와, references member테이블의 mem_id를 연결한다는 의미.
+
+
+MySQL에 프로그램 안에 연습용으로 들어있는 데이터롤 조회해보자.
+world 데이터베이스(스키마) 안에 city 테이블
+select count(*)
+from world.city;
+
+
+use market_db;
+
+UPDATE는 여러 개를 동시에 할 수 있다.
+
+UPDATE member
+SET mem_name = 'Apink'
+WHERE mem_name = '에이핑크';
+
+
+DELETE 
+FROM emp
+WHERE emp_id = 1;
+
+# TINYINT  -128 ~ 127까지의 범위를 사용함
+# smallint -??? ~ 32,767까지의 범위를 사용함
+# int      -??? ~ 21억까지의 범위를 사용
+# bigint   -??? ~ 900경 까지의 범위를 사용
+
+MySQL에서 (Oracle하고 조금 다르다.)
+한글 같은 경우 한 글자에 2범위를 사용한다. 주소는 char사용하기에 부족할 수 있겠지
+char     1~255       자릿수가 고정 길이
+         char(10) 선언 후 'abc'를 담을 경우, 10자리 모두 사용한 후 abc를 넣는다.(7개는 빈칸 - 낭비)
+varchar  1~16,000(?) 가변길이 문자형
+         varchar(10) 선언 후 'abc'를 담을 경우, 3자리만 사용한다.
+
+
+
+# JOIN 
+ 두 개의 테이블을 서로 묶어 하나의 결과를 만드는 것
+ market_db에서 member,buy 테이블
+
+ 1 : 다수 관계 -  one to many
+ 테이블은 하나로 구성되는 것보다 여러 정보를 주제에 따라 분리하여 제어하는 게 효율적이다.
+ 분리된 테이블은 서로 관계를 맺고 있다. (구매테이블buy과 고객테이블member, vip테이블vips)
+ market_db는 회원테이블의 mem_id와 구매테이블의 mem_id가 일대다 관계이다.
+ 한쪽 테이블에는 하나의 값만 존재하지만 연결된 다른 테이블에는 여러 개의 값이 존재할 수 있는 관계를 말한다.
+ (구매테이블 buy 안에 한 명의 회원이 여러 개 구매할 경우 mem_id의 값이 여러 개 남게된다.
+  그래서, 구매테이블 buy 안의 mem_id는 기본키가 아닌 외래키 Foreign key로 설정하는 것이다.)
+ 일대다 관계는 주로 기본키와 외래키로 관계를 맺는다. 이 관계를 다른 표현으로 'PK-FK관계'라고도 한다.
+
+ 예를 들면, 사원테이블 - 급여테이블
+           학생테이블 - 성적테이블
+           제품테이블 - 판매테이블
+
+
+사이트에서 한 번 이라도 구매한 기록이 있는 회원들에게
+감사 선물을 제공하려고 한다. 한 번 이상 구매한 모든 회원의 정보 확인해보자.
+
+select distinct mem_name
+from buy b,member m
+WHERE b.mem_id = m.mem_id;
+
+select DISTINCT b.mem_id
+from buy b JOIN member m
+ON b.mem_id = m.mem_id;
+
+select distinct b.mem_id, m.mem_name, m.addr
+from buy b JOIN member m
+ON b.mem_id = m.mem_id;
+
+select b.*
+from buy b JOIN member m
+ON (b.mem_id = m.mem_id)
+WHERE b.mem_id = 'BLK';
+
+
+select *
+from buy b JOIN member m
+ON (b.mem_id = m.mem_id)
+WHERE b.mem_id = 'BLK';
+
+
+select *
+from buy b, member m
+WHERE b.mem_id = m.mem_id
+AND (b.mem_id = 'BLK');
+
+
+
+
+# JOIN (외부조인)
+ 내부조인은 두 테이블에 모두 데이터가 있어야만 결과가 나온다. 
+ 외부조인은 한 쪽만 데이터가 있어도 결과가 나온다.
+ 두 테이블을 조인할 때 필요한 내용이 한 쪽 테이블에만 있어도 결과를 추출할 수 있다.
+
+SELECT 열이름
+FROM 테이블명1 LEFT/RIGHT/FULL outer join 테이블명2
+ON 조인조건
+WHERE 검색조건
+
+
+
+LEFT OUTER JOIN : 왼쪽 테이블의 내용은 모두 출력되어야 한다.
+RIGHT OUTER JOIN : 오른쪽 테이블의 내용은 모두 출력되어야 한다.
+
+
+select m.mem_id, m.mem_name, m.addr
+from member m LEFT OUTER JOIN buy b
+ON b.mem_id = m.mem_id;
+
+
+회원가입만 하고 한 번도 구매한 적이 없는 회원의 목록 출력하시오.
+
+select m.mem_name
+from member m LEFT OUTER JOIN buy b
+ON b.mem_id = m.mem_id
+WHERE prod_name is null;
+
+ 위 아래 동일하다. right/left가 기준이 된다.
+select m.mem_name
+from buy b RIGHT OUTER JOIN member m
+ON b.mem_id = m.mem_id
+WHERE prod_name is null;
+
+
+## 제약 조건 Constraint 
+ 정해 놓은 규칙에 맞는 데이터만 입력하고 규칙에 어긋나는 데이터는 거부하여 데이터의 무결성을 지키는 방법
+ 테이블을 구성하는 핵심 개념으로 잘 활용하면 오류를 줄여 완전한 코드를 만들 수 있다.
+ 대표적으로 기본키, 외래키와 같은 제약조건을 설정할 수 있다.
+ 기본키는 학번, 사번, 주민번호 등과 같은 고유한 데이터를 의미하는 열에 설정하고,
+ 외래키는 기본키와 연결되는 열에 지정한다.
+  
+ 키를 입력하는 열에는 300cm를 넘는 사람이 없겠지? 실수로 300cm 넘는 값을 입력하는 것을 방지하는 제약조건을
+ 체크 check 라고 한다. 또 국적을 입력할 때 대부분이 한국이라면 매번 입력하기 번거롭기 때문에
+ 제약조건으로 기본값을 한국으로 설정할 수 있다.
+
+ 값을 반드시 입력하게 만드는 제약조건은, NOT NULL 
+
+ 제약조건이 많으면 데이터의 오류가 적고 튼튼해진다.
+
+ 이러한 결함을 미리 방지하기 위해 회원테이블의 아이디를 기본키(PRIMARY KEY)로 지정하면 
+ '중복을 허용하지 않고 null값도 허용하지 않음'으로 설정되어, 중복된 아이디를 삽입하려고 하면 에러가 발생한다.
+ 
+ 6가지 대표적인 제약조건
+   PRIMARY KEY 
+   FOREIGN KEY
+   UNIQUE 
+   CHECK
+   DEFAULT
+   NULL
+
+ 기본키가 없어도 테이블 구성은 가능하지만, 실무에서는 테이블에 기본키를 설정해야 중복된 값을 허용하지 않게 된다.
+ 기본키는 테이블마다 1개만 가질 수 있다. 만약 고객정보 테이블에
+ 아이디, 주민번호, 이메일... 모두 기본키로 설정할 수가 있는데 어떤 녀석으로 설정할까??
+ 해당 테이블의 특성을 가장 잘 반영하는 열을 선택하는 것이 좋다. 
+ 
+ 열이름 PRIMARY KEY 
+ 
+ 테이블 생성 코드를 직접 확인해보자.
+
+ 1. PK 설정방법 (열옆에)
+
+ CREATE TABLE buy -- 구매 테이블
+(  num 		INT AUTO_INCREMENT NOT NULL PRIMARY KEY, -- 순번(PK)
+   mem_id  	CHAR(8) NOT NULL, -- 아이디(FK)
+   prod_name 	CHAR(6) NOT NULL, --  제품이름
+   group_name 	CHAR(4)  , -- 분류
+   price     	INT  NOT NULL, -- 가격
+   amount    	SMALLINT  NOT NULL, -- 수량
+   FOREIGN KEY (mem_id) REFERENCES member(mem_id)
+);
+  // ROREIGN KEY는 다른 테이블과 연결하는 키가 된다.
+  // buy테이블의 mem_id와, references member테이블의 mem_id를 연결한다는 의미.
+
+
+
+
+ 2. PK 설정방법 (구문아래에)
+
+ CREATE TABLE buy -- 구매 테이블
+(  num 		INT AUTO_INCREMENT NOT NULL, -- 순번
+   mem_id  	CHAR(8) NOT NULL, -- 아이디(FK)
+   prod_name 	CHAR(6) NOT NULL, --  제품이름
+   group_name 	CHAR(4)  , -- 분류
+   price     	INT  NOT NULL, -- 가격
+   amount    	SMALLINT  NOT NULL, -- 수량
+   PRIMARY KEY(num)    -- 아래에서 PK를 설정할 수 있다.
+   FOREIGN KEY (mem_id) REFERENCES member(mem_id)
+);
+ 
+
+
+  3. PK 설정방법 (우선 생성 후, PK설정 구문 넣기)
+
+CREATE TABLE buy -- 구매 테이블
+(  num 		INT AUTO_INCREMENT NOT NULL, -- 순번
+   mem_id  	CHAR(8) NOT NULL, -- 아이디(FK)
+   prod_name 	CHAR(6) NOT NULL, --  제품이름
+   group_name 	CHAR(4)  , -- 분류
+   price     	INT  NOT NULL, -- 가격
+   amount    	SMALLINT  NOT NULL); -- 수량
+테이블을 생성한 후, PK구문을 따로 입력해준다.
+
+ALTER TABLE buy;
+ADD CONSTRAINT PRIMARAY KEY(num):
+
+
+
+
+- PK의 이름을 정해줄 수도 있다.
+
+CREATE TABLE member (
+  product_name  char(4),
+  cost int,
+  make_date date,
+  company char(5),
+  amount int,
+  CONSTRAINT PRIMARY KEY PK_MEMBER_MEM_ID (mem_id)
+);
+
+
+
+# FOREIGN KEY 
+ 외래키 제약조건은 두 테이블 사이의 관계를 연결해 주고 그 결과 데이터의 무결성을 보장해주는 역할을 한다.
+ 외래키가 설정된 열은 반드시 다른 테이블의 기본키와 동일하다.
+ 기본키가 있는 테이블을 '기준테이블', 
+ 외래키가 있는 테이블은 '참조테이블'이라고 부른다.
+
+ 기준테이블(member)           참조테이블(buy)          
+ 아이디 PK            아이디 FK       >> 두 테이블이 연결된다.
+
+ 참조테이블이 참조하는 기준테이블의 열은 반드시 '기본키' 또는 '고유키'로 설정되어 있어야만 한다.
+
+
+
+ CREATE TABLE buy -- 구매 테이블
+(  num 		INT AUTO_INCREMENT NOT NULL PRIMARY KEY, -- 순번(PK)
+   mem_id  	CHAR(8) NOT NULL, -- 아이디(FK)
+   prod_name 	CHAR(6) NOT NULL, --  제품이름
+   group_name 	CHAR(4)  , -- 분류
+   price     	INT  NOT NULL, -- 가격
+   amount    	SMALLINT  NOT NULL, -- 수량
+   FOREIGN KEY (mem_id) REFERENCES member(mem_id)
+);
+  // ROREIGN KEY는 다른 테이블과 연결하는 키가 된다.
+  // buy테이블의 mem_id와, references member테이블의 (mem_id)를 연결한다는 의미.
+
+
+테이블 우클릭 'Alter Table' 클릭하면 테이블의 구조를 확인할 수 있다.
+그 상태에서 아래를 보면 foreign key탭을 누르고, 'Foreign Key Name'의 데이터를 누르면 
+어떤 테이블의 어떤 열을 외래키로 설정했는지 확인할 수 있다.
+
+1. 외래키 설정방법 (테이블 생성 시 FK설정)
+CREATE TABLE member (
+  product_name char(4),
+  cost int,
+  make_date date,
+  company char(5),
+  amount int,
+  FOREIGN KEY(product_name) REFERENCES member(mem_id)
+);
+
+
+
+
+2. 외래키 설정방법 (우선 테이블 생성 후 FK설정)
+CREATE TABLE member (
+  product_name char(4),
+  cost int,
+  make_date date,
+  company char(5),
+  amount int); 
+우선 테이블을 생성하고, ALTER TABLE(수정)을 통해 FK설정 구문을 한 번더 넣어준다.
+
+ALTER TABLE member 
+ADD CONSTRAINT FOREIGN KEY(mem_id)
+REFERENCES member(mem_id);
+
+
+기본키-외래키 관계가 설정되면 기준테이블의 열은 변경되거나 삭제되지 않는다.
+기준테이블의 열이름이 변경될 때 참조테이블의 열이름도 자동으로 변경되면 더 효율적일 거 같다.
+즉, 회원테이블의 BLK가 Pink로 변경되면, 자동으로 구매테이블의 BLK도 Pink로 변경된다.
+
+
+
+ERD Diagram 캡쳐하기(윈도우 + Shift + S)
+상단 'Database' 탭 >> 'Reverse Engineer' (다 뜯어서 그림으로 살펴본다)
+
+
+# 고유키(UNIQUE) 제약조건 
+  중복되지 않는, 유일한 값을 입력해야 하는 조건 
+
+
+ 고유키(Unique) 설정방법 (PK처럼 열이름 끝에 설정)
+
+CREATE TABLE member (
+  product_name char(4) PRIMARY KEY,
+  cost int,
+  make_date date,
+  company char(5) UNIQUE,
+  amount int); 
+
+
+
+# Check 제약조건 (Constraint)
+  입력할 때 데이터를 점검하는 기능으로 어떤 열에 특정 값이 들어가지 않도록 하거나,
+  '남/여' 둘 중의 하나만 입력되도록 설정하여 제약 조건을 넣을 수 있다.
+
+
+ 1. CHECK 설정방법 (테이블 생성 시 추가)
+
+CREATE TABLE member (
+  product_name char(4) PRIMARY KEY,
+  cost int,
+  make_date date,
+  company char(5) UNIQUE,
+  amount int
+  gender char(5) CHECK (gender IN ('남','여')),
+  height tinyint CHECK (height >= 100)
+ ); 
+
+
+
+
+2. CHECK 설정방법(테이블 생성 후 수정하여 제약조건을 넣는 방법)
+
+CREATE TABLE member (
+  product_name char(4) PRIMARY KEY,
+  cost int,
+  make_date date,
+  company char(5) UNIQUE,
+  amount int); 
+
+ALTER TABLE member
+ADD CONSTRAINT 
+CHECK (gender IN ('남','여')),
+CHECK (height >= 100);
+
+
+실습해보자.
+use market_db;
+
+
+ALTER TABLE member
+ADD CONSTRAINT
+CHECK (height >= 100);   // 입력할 때마다 확인하라는 의미
+
+INSERT INTO member VALUES ('BTS','정국',2,'서울',011,22222222,99,null);  // height가 Check에서 걸려서 에러
+INSERT INTO member VALUES ('BTS','정국',2,'서울',011,22222222,199,null); // ㅇㅇ 굳
+
+수정해볼까? (null값을 넣어주자 date)
+UPDATE member
+SET mem_name = 'Apink'
+WHERE mem_name = '에이핑크';
+
+
+# 기본값 default
+  값을 입력하지 않았을 때 자동으로 입력될 값을 미리 지정해 놓는 방법이다.
+
+1. default 설정방법 (생성 시 구문 안에)
+CREATE TABLE member (
+  product_name char(4) PRIMARY KEY,
+  cost int,
+  make_date date,
+  company char(5) DEFAULT '용감한형제들',
+  amount int
+  gender char(5),
+  height tinyint 
+ ); 
+
+
+
+2. default 설정방법 (테이블 생성 후 수정 시에 default설정)
+CREATE TABLE member (
+  product_name char(4) PRIMARY KEY,
+  cost int,
+  make_date date,
+  company char(5) ,
+  amount int
+  gender char(5),
+  height tinyint 
+ ); 
+우선 테이블 생성 후 아래의 구문으로 default 제약조건을 설정할 수 있다.
+
+ALTER TABLE member
+ALTER COLUMN company SET default '용감한형제들'
+
+
+
+실습해보자.
+
+ALTER TABLE emp
+ALTER COLUMN age SET default 20;
+
+INSERT INTO emp VALUES (4,'NONE',default);  // default 값인 20이 age열에 입력된다.
+
+
+
+
+# null 값 허용 (NOT NULL)
+
+ null값 허용의 설정방법(열이름 자료형 NOT NULL)
+
+CREATE TABLE member (
+  product_name char(4) PRIMARY KEY,
+  cost int NOT NULL,
+  make_date date NOT NULL,
+  company char(5) NOT NULL,
+  amount int NOT NULL,
+  gender char(5) NOT NULL,
+  height tinyint NOT NULL 
+ ); 
+
+
+
+
+# View 가상의 테이블 (바로가기 만들기 / 실제파일을 가리킨다)
+  일반 사용자의 입장에서는 테이블과 동일하게 보인다. 그렇다면 왜 View를 사용할까?
+  테이블의 필요한 내용만 골라서 보이도록 할 수 있다.
+  View는 테이블과 아주 밀접하게 연관되어 있고 한 번 생성하면 테이블이라고 생각해도 될 정도로 
+  테이블과 동일한 객체로 취급한다. 
+  
+  View는 실제 데이터를 가지고 있지 않고,
+  View에 접근하는 순간 select가 실행되고 그 결과가 화면에 출력되는 방식이다. (마치 View에 데이터가 있는 것처럼)
+  View는 단순 뷰와 복합 뷰로 나뉘는데, 
+  단순 뷰는 하나의 테이블과 연관된 뷰를 의미하고, 
+  복합 뷰는 두 개 이상의 테이블과 연관된 뷰를 말한다.
+
+
+v_테이블명  (뷰의 이름만 보고 어떤 테이블과 연계된 뷰인지 알 수 있도록 'v_접두어'를 사용하여 이름을 만든다.)
+형식은 아래와 같다.
+
+CREATE VIEW v_이름
+AS 
+SELECT 구문;
+
+
+
+
+실제 만들어보면,
+CREATE VIEW v_member
+AS 
+  SELECT mem_id, mem_name, addr
+  FROM market_db.member;
+
+
+
+실제 사용해보면,
+SELECT *
+FROM v_member;
+
+
+View에 조건식을 넣을 수도 있다. 결과는 테이블에서 추출하여 보는 것과 동일하다.
+왜 굳이 뷰를 사용할까?
+1. 보안 Security 
+   인터넷 홈쇼핑에서 회원의 정보 확인을 위해 인력을 고용해서 진행할 때
+   모든 정보가 담긴 테이블을 사용할 수 있도록 하면 상세정보가 유출되거나 수정이 될 수 있다.
+   일부 정보에만 접근을 허용하여 불필요한 정보 노출을 방지할 수 있다.
+
+2. 복잡한 SQL을 단순하게 만들 수 있다.
+   뷰 작성 시 조건을 사용하게 되면, 해당 뷰를 통한 또 다른 SQL구문은 조금 더 단순해지는 효과를 얻을 수 있다.
+
+실제 사용은 조금 복잡할 수 있다.
+# 뷰의 실제 사용 
+
+use market_db;
+
+CREATE VIEW v_viewtest1
+AS 
+  select b.mem_id 'Member ID',
+         m.mem_name 'Member Name',
+         b.prod_name 'Product Name',
+         concat(m.phone1, m.phone2) 'Office Phone'
+  from buy b INNER JOIN member m
+  ON b.mem_id = m.mem_id;
+
+
+market_db 데이터베이스(스키마) 메뉴 안에 
+Views 항목이 마치 테이블처럼 새로 생성된다.
+
+
+SELECT distinct `Member ID`, `Member Name` 
+FROM v_viewtest1;
+
+
+
+SELECT *
+FROM v_viewtest1;
+
+
+
+뷰의 삭제(drop view)는 
+drop view v_member;
+
+
+뷰를 구조 확인(describe)하기는
+describe v_viewtest1;
+
+
+뷰의 소스를 보여줘는
+show create view v_viewtest1;
+
+
+select *
+from v_viewtest1;
+
+
+# 뷰를 통해 데이터를 수정/삭제
+  (열이름은 ``를 사용, 데이터값은 '' 작은 따옴표를 사용해야 한다.)
+
+
+UPDATE v_viewtest1
+SET `Member Name` = 'Black Pink'
+WHERE `Member Name` = '블랙핑크';
+
+
+select *
+from v_viewtest1
+
+
+
+
+
+
+
+
+from emp (emp_id(int) / emp_name / age)
+from member(mem_id / mem_name / mem_number / addr / phone1 / phone2 / height / debut_date)
+from buy (mem_id / num / prod_name / group_name / price / amount)
+
+
+
+
+

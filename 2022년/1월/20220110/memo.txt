@@ -758,7 +758,7 @@ FROM emp;
 SELECT ename 이름,
        hiredate 입사일
 FROM emp
-WHERE hiredate = '81/11/17';
+WHERE hiredate = '81/111/7';
   // 다른 나라에서는 일/월/년 순으로 사용하는 경우가 있어서 못찾을 수가 있기 때문에
   // 아래와 같은 정확한 방법을 사용하자.
 
