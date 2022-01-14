@@ -8,9 +8,6 @@ https://dev.mysql.com/downloads/installer/
 mysql-installer-community-8.0.27.1.msi 를 다운로드 받자. (web이 아님)
 
 
-
-MySQL 다운로드중... 우선 HeidiSQL에서 실습하자 (구문은 같음)
-
 SELECT ~ FROM (~WHERE)
 테이블에서 데이터를 추출하는 기능 
 실제 데이터베이스의 내용은 변경되지 않는다.
@@ -617,6 +614,7 @@ ALTER COLUMN company SET default '용감한형제들'
 
 ALTER TABLE emp
 ALTER COLUMN age SET default 20;
+ 
 
 INSERT INTO emp VALUES (4,'NONE',default);  // default 값인 20이 age열에 입력된다.
 
@@ -640,108 +638,8 @@ CREATE TABLE member (
 
 
 
-# View 가상의 테이블 (바로가기 만들기 / 실제파일을 가리킨다)
-  일반 사용자의 입장에서는 테이블과 동일하게 보인다. 그렇다면 왜 View를 사용할까?
-  테이블의 필요한 내용만 골라서 보이도록 할 수 있다.
-  View는 테이블과 아주 밀접하게 연관되어 있고 한 번 생성하면 테이블이라고 생각해도 될 정도로 
-  테이블과 동일한 객체로 취급한다. 
-  
-  View는 실제 데이터를 가지고 있지 않고,
-  View에 접근하는 순간 select가 실행되고 그 결과가 화면에 출력되는 방식이다. (마치 View에 데이터가 있는 것처럼)
-  View는 단순 뷰와 복합 뷰로 나뉘는데, 
-  단순 뷰는 하나의 테이블과 연관된 뷰를 의미하고, 
-  복합 뷰는 두 개 이상의 테이블과 연관된 뷰를 말한다.
 
 
-v_테이블명  (뷰의 이름만 보고 어떤 테이블과 연계된 뷰인지 알 수 있도록 'v_접두어'를 사용하여 이름을 만든다.)
-형식은 아래와 같다.
-
-CREATE VIEW v_이름
-AS 
-SELECT 구문;
-
-
-
-
-실제 만들어보면,
-CREATE VIEW v_member
-AS 
-  SELECT mem_id, mem_name, addr
-  FROM market_db.member;
-
-
-
-실제 사용해보면,
-SELECT *
-FROM v_member;
-
-
-View에 조건식을 넣을 수도 있다. 결과는 테이블에서 추출하여 보는 것과 동일하다.
-왜 굳이 뷰를 사용할까?
-1. 보안 Security 
-   인터넷 홈쇼핑에서 회원의 정보 확인을 위해 인력을 고용해서 진행할 때
-   모든 정보가 담긴 테이블을 사용할 수 있도록 하면 상세정보가 유출되거나 수정이 될 수 있다.
-   일부 정보에만 접근을 허용하여 불필요한 정보 노출을 방지할 수 있다.
-
-2. 복잡한 SQL을 단순하게 만들 수 있다.
-   뷰 작성 시 조건을 사용하게 되면, 해당 뷰를 통한 또 다른 SQL구문은 조금 더 단순해지는 효과를 얻을 수 있다.
-
-실제 사용은 조금 복잡할 수 있다.
-# 뷰의 실제 사용 
-
-use market_db;
-
-CREATE VIEW v_viewtest1
-AS 
-  select b.mem_id 'Member ID',
-         m.mem_name 'Member Name',
-         b.prod_name 'Product Name',
-         concat(m.phone1, m.phone2) 'Office Phone'
-  from buy b INNER JOIN member m
-  ON b.mem_id = m.mem_id;
-
-
-market_db 데이터베이스(스키마) 메뉴 안에 
-Views 항목이 마치 테이블처럼 새로 생성된다.
-
-
-SELECT distinct `Member ID`, `Member Name` 
-FROM v_viewtest1;
-
-
-
-SELECT *
-FROM v_viewtest1;
-
-
-
-뷰의 삭제(drop view)는 
-drop view v_member;
-
-
-뷰를 구조 확인(describe)하기는
-describe v_viewtest1;
-
-
-뷰의 소스를 보여줘는
-show create view v_viewtest1;
-
-
-select *
-from v_viewtest1;
-
-
-# 뷰를 통해 데이터를 수정/삭제
-  (열이름은 ``를 사용, 데이터값은 '' 작은 따옴표를 사용해야 한다.)
-
-
-UPDATE v_viewtest1
-SET `Member Name` = 'Black Pink'
-WHERE `Member Name` = '블랙핑크';
-
-
-select *
-from v_viewtest1
 
 
 
